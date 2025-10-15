@@ -3,8 +3,8 @@
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
-import { CalendarDays, MapPin, User, Tag } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { CalendarDays, MapPin, User, Tag, MessageSquare } from 'lucide-react';
+import { notFound, Link } from 'next/navigation';
 
 import { events } from '@/lib/data';
 import { MainHeader } from '@/components/layout/main-header';
@@ -29,7 +29,8 @@ export default function EventPage({ params }: EventPageProps) {
 
   useEffect(() => {
     if (event) {
-      setFormattedDate(format(parseISO(event.date), 'EEEE, MMMM d, yyyy'));
+      const eventDate = parseISO(event.date);
+      setFormattedDate(format(eventDate, 'EEEE, MMMM d, yyyy'));
     }
   }, [event]);
 
@@ -94,6 +95,19 @@ export default function EventPage({ params }: EventPageProps) {
                 </CardContent>
               </Card>
               
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Event Forum</CardTitle>
+                </CardHeader>
+                <CardContent>
+                   <Button asChild className="w-full">
+                    <Link href={`/events/${event.id}/forum`}>
+                      <MessageSquare className="mr-2 h-4 w-4" /> Join Discussion
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
               <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle className="font-headline text-xl">Get Your Tickets</CardTitle>

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/layout/theme-provider';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -31,8 +32,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
+          <FirebaseClientProvider>
             {children}
-            <Toaster />
+          </FirebaseClientProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
