@@ -14,9 +14,17 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         throw new Error("User must be logged in to create an event.");
     }
     
+    // Firestore doesn't support `undefined`, so we clean the object
+    const cleanEventData = { ...eventData };
+    Object.keys(cleanEventData).forEach(key => {
+        if (cleanEventData[key as keyof typeof cleanEventData] === undefined) {
+            delete cleanEventData[key as keyof typeof cleanEventData];
+        }
+    });
+
     const docRef = await addDoc(eventsCollection, {
-        ...eventData,
-        date: eventData.date ? new Date(eventData.date) : serverTimestamp(),
+        ...cleanEventData,
+        date: cleanEventData.date ? new Date(cleanEventData.date) : serverTimestamp(),
     });
 
     return docRef.id;
