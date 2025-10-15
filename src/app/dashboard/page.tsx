@@ -8,7 +8,7 @@ import {
   DollarSign,
   Users,
 } from "lucide-react"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ import {
 import { format, formatDistanceToNow, parseISO } from "date-fns"
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import type { Event } from "@/lib/types";
+import type { Event, TicketTier } from "@/lib/types";
 import { getEventsByOrganizer } from "@/lib/events";
 import { useUser } from "@/firebase";
 
@@ -96,27 +96,42 @@ function DashboardPageContent() {
                 setLoading(false);
             }
         }
-        fetchUserEvents();
+        if (!isUserLoading) {
+            fetchUserEvents();
+        }
     }, [searchTerm, user, isUserLoading]);
 
-    const { totalRevenue, ticketsSold, activeEventsCount } = useMemo(() => {
+    const { totalRevenue, ticketsSold, activeEventsCount, revenueByTier } = useMemo(() => {
         let revenue = 0;
         let tickets = 0;
         let active = 0;
+        const tierRevenue: {[key: string]: number} = {};
         
         userEvents.forEach(event => {
-            const eventRevenue = event.ticketTiers.reduce((acc, tier) => acc + tier.price * 50, 0); // Assume 50 tickets sold per tier
-            const eventTickets = event.ticketTiers.length * 50;
-            revenue += eventRevenue;
-            tickets += eventTickets;
+            event.ticketTiers.forEach(tier => {
+                const sold = Math.floor(Math.random() * 100) + 10; // Mock tickets sold
+                const tierRev = tier.price * sold;
+                revenue += tierRev;
+                tickets += sold;
+                if (!tierRevenue[tier.name]) {
+                    tierRevenue[tier.name] = 0;
+                }
+                tierRevenue[tier.name] += tierRev;
+            })
             if (event.isUpcoming) {
                 active++;
             }
         });
+        const formattedTierRevenue = Object.keys(tierRevenue).map(name => ({
+            name,
+            revenue: tierRevenue[name]
+        }));
+
         return {
             totalRevenue: revenue,
             ticketsSold: tickets,
-            activeEventsCount: active
+            activeEventsCount: active,
+            revenueByTier: formattedTierRevenue
         };
     }, [userEvents]);
 
@@ -220,7 +235,7 @@ function DashboardPageContent() {
                         <TableCell className="hidden md:table-cell">
                         {event.formattedDate}
                         </TableCell>
-                        <TableCell className="text-right">${(event.ticketTiers.reduce((acc, tier) => acc + tier.price * 50, 0)).toLocaleString()}</TableCell>
+                        <TableCell className="text-right">${(event.ticketTiers.reduce((acc, tier) => acc + tier.price * (Math.floor(Math.random() * 100) + 10), 0)).toLocaleString()}</TableCell>
                     </TableRow>
                     ))}
                 </TableBody>
@@ -229,16 +244,19 @@ function DashboardPageContent() {
             </Card>
             <Card className="col-span-1 lg:col-span-3">
               <CardHeader>
-                <CardTitle>Revenue Overview</CardTitle>
-                <CardDescription>A summary of your earnings over the past 6 months.</CardDescription>
+                <CardTitle>Revenue by Ticket Type</CardTitle>
+                <CardDescription>A breakdown of revenue from different ticket tiers.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={revenueData}>
-                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value / 1000}k`} />
-                    <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  </BarChart>
+                    <BarChart data={revenueByTier} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
+                        <Tooltip formatter={(value) => `$${(value as number).toLocaleString()}`} />
+                        <Legend />
+                        <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue" />
+                    </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
