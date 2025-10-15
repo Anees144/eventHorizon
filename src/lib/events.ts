@@ -14,18 +14,34 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         throw new Error("User must be logged in to create an event.");
     }
     
-    // Firestore doesn't support `undefined`, so we clean the object
-    const cleanEventData = { ...eventData };
-    Object.keys(cleanEventData).forEach(key => {
-        if (cleanEventData[key as keyof typeof cleanEventData] === undefined) {
-            delete cleanEventData[key as keyof typeof cleanEventData];
-        }
-    });
+    // Create a new object for Firestore, only including defined values.
+    const dataToSave: any = {
+        title: eventData.title,
+        description: eventData.description,
+        richDescription: eventData.richDescription,
+        category: eventData.category,
+        location: eventData.location,
+        imageUrl: eventData.imageUrl,
+        imageHint: eventData.imageHint,
+        visibility: eventData.visibility,
+        date: eventData.date ? new Date(eventData.date) : serverTimestamp(),
+        ticketTiers: eventData.ticketTiers,
+        promoCodes: eventData.promoCodes,
+        organizerId: eventData.organizerId,
+        organizer: eventData.organizer,
+        latitude: eventData.latitude,
+        longitude: eventData.longitude,
+    };
 
-    const docRef = await addDoc(eventsCollection, {
-        ...cleanEventData,
-        date: cleanEventData.date ? new Date(cleanEventData.date) : serverTimestamp(),
-    });
+    // Only add optional fields if they exist to avoid 'undefined' errors.
+    if (eventData.videoUrl) {
+        dataToSave.videoUrl = eventData.videoUrl;
+    }
+    if (eventData.tags) {
+        dataToSave.tags = eventData.tags;
+    }
+
+    const docRef = await addDoc(eventsCollection, dataToSave);
 
     return docRef.id;
 }
