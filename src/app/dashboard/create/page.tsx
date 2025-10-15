@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
@@ -19,7 +19,7 @@ import {
   Tag,
   Lock,
 } from "lucide-react"
-import { format, formatDistanceToNow, parseISO } from "date-fns"
+import { format } from "date-fns"
 import Image from "next/image"
 
 import { Badge } from "@/components/ui/badge"
@@ -82,7 +82,7 @@ export default function CreateEventPage() {
   const [tags, setTags] = useState('#synthwave, #80s, #retro, #music');
   const [visibility, setVisibility] = useState<Event['visibility']>('public');
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
     { id: 't1-1', name: 'General Admission', type: 'paid', price: 25 },
     { id: 't1-2', name: 'VIP Access', type: 'paid', price: 75 },
@@ -93,6 +93,11 @@ export default function CreateEventPage() {
   const [selectedTier, setSelectedTier] = useState<Partial<TicketTier> | null>(ticketTiers.length > 0 ? ticketTiers[0] : null);
 
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    // This effect runs only on the client, after hydration, preventing mismatch
+    setDate(new Date());
+  }, []);
 
   const handleSaveEvent = async () => {
     if (!user) {
@@ -567,5 +572,3 @@ export default function CreateEventPage() {
     </div>
   )
 }
-
-    
