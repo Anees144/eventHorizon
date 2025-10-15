@@ -176,7 +176,9 @@ export default function EventPage() {
                 </CardHeader>
                 <CardContent className="flex items-center gap-2 text-muted-foreground">
                   <User className="h-5 w-5" />
-                  <span>{event.organizer}</span>
+                  <Link href={`/organizer/${event.organizerId}`} className="hover:underline text-primary">
+                    {event.organizer}
+                  </Link>
                 </CardContent>
               </Card>
 
