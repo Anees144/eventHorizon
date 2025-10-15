@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from "next/link"
@@ -13,7 +14,8 @@ import {
   Ticket,
   Eye,
   Star,
-  UserPlus
+  UserPlus,
+  Youtube
 } from "lucide-react"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
 import Image from "next/image"
@@ -56,6 +58,7 @@ import { categories } from "@/lib/data"
 import type { TicketTier, PromoCode } from "@/lib/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
+import { VideoEmbed } from "@/components/events/video-embed";
 
 
 export default function CreateEventPage() {
@@ -66,6 +69,7 @@ export default function CreateEventPage() {
   const [location, setLocation] = useState('Cyber City, Neo-Tokyo');
   const [imageUrl, setImageUrl] = useState('https://picsum.photos/seed/1/600/400');
   const [imageHint, setImageHint] = useState('music concert');
+  const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
@@ -191,6 +195,20 @@ export default function CreateEventPage() {
                     onChange={(e) => setRichDescription(e.target.value)}
                     className="min-h-32"
                     />
+                </div>
+                 <div className="grid gap-3">
+                    <Label htmlFor="video-url">Promotional Video</Label>
+                    <div className="relative">
+                      <Youtube className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="video-url"
+                        type="url"
+                        className="w-full pl-9"
+                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                      />
+                    </div>
                 </div>
                 </div>
             </CardContent>
@@ -378,8 +396,9 @@ export default function CreateEventPage() {
             <div className="p-4 md:p-6 grid gap-8">
               <div>
                 <h2 className="font-headline text-xl font-bold">About this event</h2>
+                 {videoUrl && <VideoEmbed url={videoUrl} className="mt-4" />}
                 <div
-                  className="prose prose-sm mt-2 max-w-none text-foreground/90"
+                  className="prose prose-sm mt-4 max-w-none text-foreground/90"
                   dangerouslySetInnerHTML={{ __html: richDescription }}
                 />
               </div>

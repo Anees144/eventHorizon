@@ -1,4 +1,5 @@
 
+
 import type { DateRange } from "react-day-picker";
 
 export type User = {
@@ -24,6 +25,7 @@ export type Event = {
   richDescription: string;
   imageUrl: string;
   imageHint: string;
+  videoUrl?: string;
   category: string;
   date: string;
   location: string;

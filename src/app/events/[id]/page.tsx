@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Image from 'next/image';
@@ -22,6 +23,7 @@ import { useEffect, useState } from 'react';
 import type { TicketTier, UserProfile } from '@/lib/types';
 import { CalendarButton } from '@/components/events/calendar-button';
 import { ShareButton } from '@/components/events/share-button';
+import { VideoEmbed } from '@/components/events/video-embed';
 
 export default function EventPage() {
   const params = useParams();
@@ -134,12 +136,15 @@ export default function EventPage() {
 
         <section className="py-12 md:py-16">
           <div className="container grid gap-12 px-4 md:grid-cols-3 md:px-6">
-            <div className="md:col-span-2">
-              <h2 className="font-headline text-2xl font-bold">About this event</h2>
-              <div
-                className="prose prose-lg mt-4 max-w-none text-foreground/90"
-                dangerouslySetInnerHTML={{ __html: event.richDescription }}
-              />
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <h2 className="font-headline text-2xl font-bold">About this event</h2>
+                {event.videoUrl && <VideoEmbed url={event.videoUrl} className="mt-4" />}
+                <div
+                  className="prose prose-lg mt-4 max-w-none text-foreground/90"
+                  dangerouslySetInnerHTML={{ __html: event.richDescription }}
+                />
+              </div>
             </div>
             <div className="space-y-8">
               <Card>
@@ -195,9 +200,11 @@ export default function EventPage() {
                 <CardHeader>
                   <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                   <CalendarButton event={event} />
-                   <ShareButton event={event} />
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <CalendarButton event={event} />
+                    <ShareButton event={event} />
+                  </div>
                 </CardContent>
               </Card>
 
