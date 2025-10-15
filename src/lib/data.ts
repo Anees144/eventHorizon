@@ -115,6 +115,91 @@ export const events: Event[] = [
         ticketTiers: [
             { id: 't6-1', name: 'All-Inclusive Weekend', price: 500 },
         ]
+    },
+    {
+        id: '7',
+        title: 'Indie Rock Fest',
+        description: 'Discover your new favorite indie bands at this day-long festival.',
+        richDescription: '<p><strong>Indie Rock Fest</strong> is a celebration of independent music. Featuring three stages and over 20 bands, it\'s a full day of great tunes, food trucks, and good vibes.</p>',
+        imageUrl: getImage('music concert').imageUrl,
+        imageHint: 'music concert',
+        category: 'Music',
+        date: '2024-09-21T14:00:00.000Z',
+        location: 'Greenfield Park, Austin',
+        organizer: 'SoundWave Events',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't7-1', name: 'Early Bird', price: 40 },
+            { id: 't7-2', name: 'General Admission', price: 60 },
+        ]
+    },
+    {
+        id: '8',
+        title: 'Future of Web3',
+        description: 'A deep dive into the decentralized web, blockchain, and NFTs.',
+        richDescription: '<p>Join the brightest minds in decentralized technology at the <strong>Future of Web3</strong> conference. We will cover everything from DeFi to DAOs and the new creator economy.</p>',
+        imageUrl: getImage('tech conference').imageUrl,
+        imageHint: 'tech conference',
+        category: 'Technology',
+        date: '2024-11-12T09:00:00.000Z',
+        location: 'Virtual Event',
+        organizer: 'CryptoCon',
+        organizerId: 'user-2',
+        ticketTiers: [
+            { id: 't8-1', name: 'Virtual Pass', price: 50 },
+            { id: 't8-2', name: 'VIP Virtual Pass', price: 150 },
+        ]
+    },
+    {
+        id: '9',
+        title: 'Night at the Theater: Hamlet',
+        description: 'A modern interpretation of Shakespeare\'s classic tragedy.',
+        richDescription: '<p>Experience <strong>Hamlet</strong> like never before. This production brings Shakespeare\'s timeless story of revenge, madness, and moral corruption into the 21st century with a powerful and minimalist aesthetic.</p>',
+        imageUrl: getImage('theater show').imageUrl,
+        imageHint: 'theater show',
+        category: 'Art',
+        date: '2024-08-22T19:30:00.000Z',
+        location: 'The Grand Stage, New York',
+        organizer: 'Modern Bard Company',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't9-1', name: 'Balcony', price: 45 },
+            { id: 't9-2', name: 'Orchestra', price: 85 },
+        ]
+    },
+    {
+        id: '10',
+        title: 'Championship Finals',
+        description: 'Witness the climax of the season in this epic basketball showdown.',
+        richDescription: '<p>The <strong>Championship Finals</strong> are here! The top two teams battle it out for glory. Expect a high-energy game with dazzling plays and a roaring crowd. Don\'t miss the action!</p>',
+        imageUrl: getImage('sports game').imageUrl,
+        imageHint: 'sports game',
+        category: 'Sports',
+        date: '2024-09-14T18:00:00.000Z',
+        location: 'The Arena, Los Angeles',
+        organizer: 'National Basketball League',
+        organizerId: 'user-4',
+        ticketTiers: [
+            { id: 't10-1', name: 'Upper Bowl', price: 80 },
+            { id: 't10-2', name: 'Lower Bowl', price: 250 },
+            { id: 't10-3', name: 'Courtside', price: 1500 },
+        ]
+    },
+    {
+        id: '11',
+        title: 'Park Cleanup & Picnic',
+        description: 'Join us to beautify our local park and enjoy a community picnic afterwards.',
+        richDescription: '<p>Let\'s make a difference together! At the <strong>Park Cleanup & Picnic</strong>, we\'ll spend the morning cleaning up our beloved community park. Afterwards, we\'ll celebrate our hard work with a free picnic for all volunteers.</p>',
+        imageUrl: getImage('community meetup').imageUrl,
+        imageHint: 'community meetup',
+        category: 'Community',
+        date: '2024-08-17T09:00:00.000Z',
+        location: 'Central Park, Springfield',
+        organizer: 'Springfield Action Committee',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't11-1', name: 'Volunteer (Free)', price: 0 },
+        ]
     }
 ];
 
