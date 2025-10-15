@@ -4,7 +4,8 @@
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
-import { notFound, Link } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
@@ -21,14 +22,11 @@ import { useEffect, useState } from 'react';
 import type { TicketTier, UserProfile } from '@/lib/types';
 import { CalendarButton } from '@/components/events/calendar-button';
 
-type EventPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default function EventPage({ params }: EventPageProps) {
-  const event = events.find((e) => e.id === params.id);
+export default function EventPage() {
+  const params = useParams();
+  const eventId = params.id as string;
+  const event = events.find((e) => e.id === eventId);
+  
   const [formattedDate, setFormattedDate] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
 
