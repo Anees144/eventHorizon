@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
-import { CalendarDays, MapPin, User, Tag, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
+import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
 import { notFound, Link } from 'next/navigation';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
 import type { TicketTier, UserProfile } from '@/lib/types';
+import { CalendarButton } from '@/components/events/calendar-button';
 
 type EventPageProps = {
   params: {
@@ -158,6 +159,15 @@ export default function EventPage({ params }: EventPageProps) {
                 </CardContent>
               </Card>
               
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Add to Calendar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                   <CalendarButton event={event} />
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="font-headline">Event Forum</CardTitle>
