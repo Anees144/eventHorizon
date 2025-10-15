@@ -318,29 +318,38 @@ export default function CreateEventPage() {
 
             <Card className="overflow-hidden">
                 <CardHeader>
-                    <CardTitle>Event Image</CardTitle>
+                    <CardTitle>Event Banner & Gallery</CardTitle>
+                    <CardDescription>
+                        Upload a banner and gallery images for your event.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-2">
-                        <div className="relative w-full aspect-[3/2] rounded-md overflow-hidden">
-                             <Image
-                                alt="Product image"
-                                className="object-cover"
-                                fill
-                                src={imageUrl}
-                            />
+                    <div className="grid gap-4">
+                        <div>
+                            <Label className="mb-2 block">Banner Image</Label>
+                            <div className="relative w-full aspect-[16/9] rounded-md overflow-hidden border">
+                                <Image
+                                    alt="Event Banner"
+                                    className="object-cover"
+                                    fill
+                                    src={imageUrl}
+                                />
+                            </div>
                         </div>
-                    <div className="grid grid-cols-3 items-center gap-2">
-                        {['https://picsum.photos/seed/11/84/84', 'https://picsum.photos/seed/12/84/84'].map(src => (
-                             <button key={src} className="relative aspect-square w-full rounded-md overflow-hidden" onClick={() => setImageUrl(src.replace('/84/84','/600/400'))}>
-                                <Image alt="Product image" fill className="object-cover" src={src} />
-                            </button>
-                        ))}
-                        <button className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed">
-                            <Upload className="h-4 w-4 text-muted-foreground" />
-                            <span className="sr-only">Upload</span>
-                        </button>
-                    </div>
+                        <div className="grid gap-2">
+                             <Label>Gallery</Label>
+                            <div className="grid grid-cols-4 items-center gap-2">
+                                {['https://picsum.photos/seed/11/84/84', 'https://picsum.photos/seed/12/84/84', 'https://picsum.photos/seed/13/84/84'].map(src => (
+                                    <button key={src} className="relative aspect-square w-full rounded-md overflow-hidden" onClick={() => setImageUrl(src.replace('/84/84','/600/400'))}>
+                                        <Image alt="Gallery thumbnail" fill className="object-cover" src={src} />
+                                    </button>
+                                ))}
+                                <Button variant="outline" className="flex aspect-square w-full items-center justify-center rounded-md border-dashed">
+                                    <Upload className="h-4 w-4 text-muted-foreground" />
+                                    <span className="sr-only">Upload</span>
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -439,5 +448,3 @@ export default function CreateEventPage() {
     </div>
   )
 }
-
-    
