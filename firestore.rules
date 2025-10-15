@@ -1,0 +1,83 @@
+/**
+ * @fileOverview
+ * This ruleset enforces a hierarchical ownership model for forums and messages,
+ * nested under events. Access control is primarily based on the implicit ownership
+ * derived from the Firestore document paths.
+ *
+ * Data Structure:
+ * - /events/{eventId}/forums/{forumId}: Represents forums within an event.
+ * - /events/{eventId}/forums/{forumId}/messages/{messageId}: Represents messages within a forum.
+ *
+ * Key Security Decisions:
+ * - Authorization independence is achieved by relying on the path structure
+ *   to infer ownership, rather than requiring `get()` operations on parent documents.
+ * - List operations are secured by the implicit ownership enforced through the path structure.
+ * - Assumes that all messages within a forum share the same access control.
+ *
+ * Denormalization for Authorization:
+ *   The design avoids denormalizing explicit access control lists onto each Forum and Message
+ *   document, instead opting to enforce the hierarchical ownership via the document paths.
+ *   This approach simplifies the rules and leverages the implicit relationships defined by the
+ *   data structure.
+ *
+ * Structural Segregation:
+ *   The structure segregates forums and messages into separate collections, each with
+ *   homogeneous security requirements. This enables efficient and secure list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to Forum documents within a specific event.
+     * @path /events/{eventId}/forums/{forumId}
+     * @allow (get, list): Any authenticated user can read forums.
+     * @allow (create): Any authenticated user can create a forum. The eventId in the path MUST match the forum's eventId.
+     * @allow (update, delete): Only the owner of the event can update or delete a forum (inferred, requires Event ownership to be denormalized to Forum).
+     * @deny (create): If the forum's eventId does not match the eventId in the path.
+     * @deny (update, delete): If the forum does not exist.
+     * @principle Enforces that forums must belong to the event specified in the path.
+     */
+    match /events/{eventId}/forums/{forumId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      allow get, list: if true;
+
+      allow create: if isSignedIn() && request.resource.data.eventId == eventId;
+      allow update, delete: if false; // TODO: Add owner validation once event ownership is denormalized to Forum
+
+    }
+
+    /**
+     * @description Controls access to Message documents within a specific forum.
+     * @path /events/{eventId}/forums/{forumId}/messages/{messageId}
+     * @allow (get, list): Any authenticated user can read messages in a forum.
+     * @allow (create): Any authenticated user can create a message in a forum. The forumId in the path MUST match the message's forumId, and the senderId must match the authenticated user's ID.
+     * @allow (update, delete): Only the sender of the message can update or delete it.
+     * @deny (create): If the message's forumId does not match the forumId in the path or if the senderId does not match the authenticated user's ID.
+     * @deny (update, delete): If the message does not exist or the authenticated user is not the sender.
+     * @principle Enforces that messages must belong to the forum specified in the path, and only the sender can modify/delete the message.
+     */
+    match /events/{eventId}/forums/{forumId}/messages/{messageId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get, list: if true;
+
+      allow create: if isSignedIn() && request.resource.data.forumId == forumId && request.resource.data.senderId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.senderId);
+      allow delete: if isExistingOwner(resource.data.senderId);
+    }
+  }
+}

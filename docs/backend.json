@@ -1,0 +1,125 @@
+{
+  "entities": {
+    "Message": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Message",
+      "type": "object",
+      "description": "Represents a single message within the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message."
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Reference to User who sent the message. (Relationship: User 1:N Message)"
+        },
+        "forumId": {
+          "type": "string",
+          "description": "Reference to Forum where the message was posted. (Relationship: Forum 1:N Message)"
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date and time when the message was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "senderId",
+        "forumId",
+        "content",
+        "timestamp"
+      ]
+    },
+    "Forum": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Forum",
+      "type": "object",
+      "description": "Represents a forum associated with an event.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the forum."
+        },
+        "eventId": {
+          "type": "string",
+          "description": "Reference to Event that the forum is associated with. (Relationship: Event 1:1 Forum)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the forum."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the forum."
+        }
+      },
+      "required": [
+        "id",
+        "eventId",
+        "name",
+        "description"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/events/{eventId}/forums/{forumId}",
+        "definition": {
+          "entityName": "Forum",
+          "schema": {
+            "$ref": "#/backend/entities/Forum"
+          },
+          "description": "Represents a forum associated with an event. Includes denormalized event access control information for authorization independence.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "The ID of the event this forum belongs to."
+            },
+            {
+              "name": "forumId",
+              "description": "The unique ID of the forum."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/events/{eventId}/forums/{forumId}/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": {
+            "$ref": "#/backend/entities/Message"
+          },
+          "description": "Represents a message within a forum. Includes denormalized forum access control information for authorization independence.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "The ID of the event this forum belongs to."
+            },
+            {
+              "name": "forumId",
+              "description": "The ID of the forum this message belongs to."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique ID of the message."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This design prioritizes authorization independence and QAPs. Forums are linked to Events, and Messages are linked to Forums. To ensure authorization independence (avoiding `get()` calls in security rules), relevant authorization data is denormalized. Specifically, any role or access control information related to an Event is mirrored within the Forum documents, and any access control for a Forum is copied to it's Messages. This allows security rules to validate access without needing to read parent documents.\n\nTo support QAPs (rules are not filters), we segregate data with different security requirements. Each entity (Forums and Messages) has its own collection, and each collection contains documents with a homogeneous security posture, which makes list operations efficient and secure.\n\nOwnership is implicitly managed through hierarchical paths. The `/events/{eventId}/forums/{forumId}/messages/{messageId}` path implies that messages belong to forums, and forums belong to events. Security rules can easily enforce this ownership relationship based on the path structure."
+  }
+}
