@@ -32,7 +32,7 @@ export function MainHeader() {
   );
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    router.push(`/?${createQueryString('search', e.target.value)}`);
+    router.push(`/discover?${createQueryString('search', e.target.value)}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +43,7 @@ export function MainHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/discover" className="mr-6 flex items-center space-x-2">
             <Logo className="h-6 w-6" />
             <span className="hidden font-bold sm:inline-block font-headline">
               Event Horizon
@@ -51,7 +51,7 @@ export function MainHeader() {
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
-              href="/"
+              href="/discover"
               className="transition-colors hover:text-primary"
             >
               Discover

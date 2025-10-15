@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -12,7 +13,8 @@ import {
   Settings,
   Sparkles,
   Users,
-  Bookmark
+  Bookmark,
+  Compass
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +43,7 @@ import { useCallback } from 'react';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
+  { href: '/discover', icon: Compass, label: 'Discover Events' },
   { href: '/dashboard/recommendations', icon: Sparkles, label: 'For You' },
   { href: '/dashboard/saved-events', icon: Bookmark, label: 'Saved Events' },
   { href: '/dashboard/create', icon: CalendarCheck, label: 'Create Event' },
@@ -70,24 +73,15 @@ export default function DashboardLayout({
   );
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only apply search on the dashboard page
-    if (pathname === '/dashboard') {
-      router.push(`${pathname}?${createQueryString('search', e.target.value)}`);
-    } else {
-      // If on other pages, navigate to homepage with search
-      router.push(`/?${createQueryString('search', e.target.value)}`);
-    }
+    // Always search on the discover page
+    router.push(`/discover?${createQueryString('search', e.target.value)}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const search = formData.get('search') as string;
-    if (pathname === '/dashboard') {
-      router.push(`${pathname}?${createQueryString('search', search)}`);
-    } else {
-      router.push(`/?${createQueryString('search', search)}`);
-    }
+    router.push(`/discover?${createQueryString('search', search)}`);
   };
 
   return (
@@ -95,7 +89,7 @@ export default function DashboardLayout({
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-16 items-center border-b px-4 lg:h-[68px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
+            <Link href="/discover" className="flex items-center gap-2 font-semibold">
               <Logo className="h-6 w-6" />
               <span className="font-headline">Event Horizon</span>
             </Link>
@@ -132,7 +126,7 @@ export default function DashboardLayout({
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
                 <Link
-                  href="/"
+                  href="/discover"
                   className="flex items-center gap-2 text-lg font-semibold"
                 >
                   <Logo className="h-6 w-6" />
