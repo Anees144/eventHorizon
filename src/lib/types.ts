@@ -22,12 +22,14 @@ export type Event = {
   ticketTiers: TicketTier[];
   latitude: number;
   longitude: number;
+  promoCodes: PromoCode[];
 };
 
 export type TicketTier = {
   id: string;
   name: string;
   price: number;
+  type: 'paid' | 'reservation' | 'donation';
 };
 
 export type FilterState = {
@@ -37,3 +39,8 @@ export type FilterState = {
     search: string;
     radius: number;
 }
+
+export type PromoCode = {
+  code: string;
+  discountPercentage: number;
+};

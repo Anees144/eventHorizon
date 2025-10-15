@@ -1,5 +1,5 @@
 
-import type { Event, User } from './types';
+import type { Event, User, PromoCode } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (hint: string) => {
@@ -31,8 +31,12 @@ export const events: Event[] = [
         organizer: 'RetroWave Productions',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't1-1', name: 'General Admission', price: 25 },
-            { id: 't1-2', name: 'VIP Access', price: 75 },
+            { id: 't1-1', name: 'General Admission', price: 25, type: 'paid' },
+            { id: 't1-2', name: 'VIP Access', price: 75, type: 'paid' },
+        ],
+        promoCodes: [
+            { code: 'SYNTH10', discountPercentage: 10 },
+            { code: 'WAVE20', discountPercentage: 20 },
         ]
     },
     {
@@ -50,10 +54,11 @@ export const events: Event[] = [
         organizer: 'TechForward',
         organizerId: 'user-2',
         ticketTiers: [
-            { id: 't2-1', name: 'Student Pass', price: 100 },
-            { id: 't2-2', name: 'Full Access', price: 400 },
-            { id: 't2-3', name: 'Corporate Pass', price: 1200 },
-        ]
+            { id: 't2-1', name: 'Student Pass', price: 100, type: 'paid' },
+            { id: 't2-2', name: 'Full Access', price: 400, type: 'paid' },
+            { id: 't2-3', name: 'Corporate Pass', price: 1200, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '3',
@@ -70,8 +75,9 @@ export const events: Event[] = [
         organizer: 'ArtConnect',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't3-1', name: 'Single Entry', price: 15 },
-        ]
+            { id: 't3-1', name: 'Single Entry', price: 15, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '4',
@@ -88,9 +94,10 @@ export const events: Event[] = [
         organizer: 'TasteMakers Inc.',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't4-1', name: 'Entry', price: 10 },
-            { id: 't4-2', name: 'Tasting Passport', price: 50 },
-        ]
+            { id: 't4-1', name: 'Entry', price: 10, type: 'paid' },
+            { id: 't4-2', name: 'Tasting Passport', price: 50, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '5',
@@ -107,9 +114,10 @@ export const events: Event[] = [
         organizer: 'Innovate UK',
         organizerId: 'user-2',
         ticketTiers: [
-            { id: 't5-1', name: 'Spectator', price: 20 },
-            { id: 't5-2', name: 'Investor Access', price: 150 },
-        ]
+            { id: 't5-1', name: 'Spectator', price: 20, type: 'paid' },
+            { id: 't5-2', name: 'Investor Access', price: 150, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '6',
@@ -126,8 +134,9 @@ export const events: Event[] = [
         organizer: 'ZenLife',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't6-1', name: 'All-Inclusive Weekend', price: 500 },
-        ]
+            { id: 't6-1', name: 'All-Inclusive Weekend', price: 500, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '7',
@@ -144,9 +153,10 @@ export const events: Event[] = [
         organizer: 'SoundWave Events',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't7-1', name: 'Early Bird', price: 40 },
-            { id: 't7-2', name: 'General Admission', price: 60 },
-        ]
+            { id: 't7-1', name: 'Early Bird', price: 40, type: 'paid' },
+            { id: 't7-2', name: 'General Admission', price: 60, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '8',
@@ -163,17 +173,18 @@ export const events: Event[] = [
         organizer: 'CryptoCon',
         organizerId: 'user-2',
         ticketTiers: [
-            { id: 't8-1', name: 'Virtual Pass', price: 50 },
-            { id: 't8-2', name: 'VIP Virtual Pass', price: 150 },
-        ]
+            { id: 't8-1', name: 'Virtual Pass', price: 50, type: 'paid' },
+            { id: 't8-2', name: 'VIP Virtual Pass', price: 150, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '9',
         title: 'Night at the Theater: Hamlet',
         description: 'A modern interpretation of Shakespeare\'s classic tragedy.',
         richDescription: '<p>Experience <strong>Hamlet</strong> like never before. This production brings Shakespeare\'s timeless story of revenge, madness, and moral corruption into the 21st century with a powerful and minimalist aesthetic.</p>',
-        imageUrl: getImage('theater show').imageUrl,
-        imageHint: 'theater show',
+        imageUrl:getImage('theater show').imageUrl,
+        imageHint: getImage('theater show').imageHint,
         category: 'Art',
         date: '2024-08-22T19:30:00.000Z',
         location: 'The Grand Stage, New York',
@@ -182,9 +193,10 @@ export const events: Event[] = [
         organizer: 'Modern Bard Company',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't9-1', name: 'Balcony', price: 45 },
-            { id: 't9-2', name: 'Orchestra', price: 85 },
-        ]
+            { id: 't9-1', name: 'Balcony', price: 45, type: 'paid' },
+            { id: 't9-2', name: 'Orchestra', price: 85, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '10',
@@ -192,7 +204,7 @@ export const events: Event[] = [
         description: 'Witness the climax of the season in this epic basketball showdown.',
         richDescription: '<p>The <strong>Championship Finals</strong> are here! The top two teams battle it out for glory. Expect a high-energy game with dazzling plays and a roaring crowd. Don\'t miss the action!</p>',
         imageUrl: getImage('sports game').imageUrl,
-        imageHint: 'sports game',
+        imageHint: getImage('sports game').imageHint,
         category: 'Sports',
         date: '2024-09-14T18:00:00.000Z',
         location: 'The Arena, Los Angeles',
@@ -201,10 +213,11 @@ export const events: Event[] = [
         organizer: 'National Basketball League',
         organizerId: 'user-4',
         ticketTiers: [
-            { id: 't10-1', name: 'Upper Bowl', price: 80 },
-            { id: 't10-2', name: 'Lower Bowl', price: 250 },
-            { id: 't10-3', name: 'Courtside', price: 1500 },
-        ]
+            { id: 't10-1', name: 'Upper Bowl', price: 80, type: 'paid' },
+            { id: 't10-2', name: 'Lower Bowl', price: 250, type: 'paid' },
+            { id: 't10-3', name: 'Courtside', price: 1500, type: 'paid' },
+        ],
+        promoCodes: []
     },
     {
         id: '11',
@@ -212,7 +225,7 @@ export const events: Event[] = [
         description: 'Join us to beautify our local park and enjoy a community picnic afterwards.',
         richDescription: '<p>Let\'s make a difference together! At the <strong>Park Cleanup & Picnic</strong>, we\'ll spend the morning cleaning up our beloved community park. Afterwards, we\'ll celebrate our hard work with a free picnic for all volunteers.</p>',
         imageUrl: getImage('community meetup').imageUrl,
-        imageHint: 'community meetup',
+        imageHint: getImage('community meetup').imageHint,
         category: 'Community',
         date: '2024-08-17T09:00:00.000Z',
         location: 'Central Park, Springfield',
@@ -221,8 +234,10 @@ export const events: Event[] = [
         organizer: 'Springfield Action Committee',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't11-1', name: 'Volunteer (Free)', price: 0 },
-        ]
+            { id: 't11-1', name: 'Volunteer (Free)', price: 0, type: 'reservation' },
+            { id: 't11-2', name: 'Support with a Donation', price: 0, type: 'donation' },
+        ],
+        promoCodes: []
     },
     {
         id: '12',
@@ -239,9 +254,10 @@ export const events: Event[] = [
         organizer: 'Global Gaming League',
         organizerId: 'user-2',
         ticketTiers: [
-            { id: 't12-1', name: 'Floor Seats', price: 50 },
-            { id: 't12-2', name: 'Stadium Seating', price: 30 }
-        ]
+            { id: 't12-1', name: 'Floor Seats', price: 50, type: 'paid' },
+            { id: 't12-2', name: 'Stadium Seating', price: 30, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '13',
@@ -258,9 +274,10 @@ export const events: Event[] = [
         organizer: 'Chicago Jazz Society',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't13-1', name: 'Lawn Seating', price: 25 },
-            { id: 't13-2', name: 'Reserved Chair', price: 45 }
-        ]
+            { id: 't13-1', name: 'Lawn Seating', price: 25, type: 'paid' },
+            { id: 't13-2', name: 'Reserved Chair', price: 45, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '14',
@@ -277,9 +294,10 @@ export const events: Event[] = [
         organizer: 'Urban Canvas Tours',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't14-1', name: 'Adult', price: 20 },
-            { id: 't14-2', name: 'Student', price: 15 }
-        ]
+            { id: 't14-1', name: 'Adult', price: 20, type: 'paid' },
+            { id: 't14-2', name: 'Student', price: 15, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '15',
@@ -296,8 +314,9 @@ export const events: Event[] = [
         organizer: 'Belgian Chocolate School',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't15-1', name: 'Workshop Fee', price: 80 }
-        ]
+            { id: 't15-1', name: 'Workshop Fee', price: 80, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '16',
@@ -314,9 +333,10 @@ export const events: Event[] = [
         organizer: 'LeadHers Network',
         organizerId: 'user-2',
         ticketTiers: [
-            { id: 't16-1', name: 'Early Bird', price: 250 },
-            { id: 't16-2', name: 'General Admission', price: 350 }
-        ]
+            { id: 't16-1', name: 'Early Bird', price: 250, type: 'paid' },
+            { id: 't16-2', name: 'General Admission', price: 350, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '17',
@@ -333,9 +353,10 @@ export const events: Event[] = [
         organizer: 'The Unplugged Movement',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't17-1', name: 'Shared Cabin', price: 300 },
-            { id: 't17-2', name: 'Private Cabin', price: 450 }
-        ]
+            { id: 't17-1', name: 'Shared Cabin', price: 300, type: 'paid' },
+            { id: 't17-2', name: 'Private Cabin', price: 450, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '18',
@@ -352,8 +373,9 @@ export const events: Event[] = [
         organizer: 'SoCal Sports League',
         organizerId: 'user-4',
         ticketTiers: [
-            { id: 't18-1', name: 'Team Registration (4 players)', price: 100 }
-        ]
+            { id: 't18-1', name: 'Team Registration (4 players)', price: 100, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '19',
@@ -370,8 +392,9 @@ export const events: Event[] = [
         organizer: 'Maplewood Safety Alliance',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't19-1', name: 'Attendance', price: 0 }
-        ]
+            { id: 't19-1', name: 'Attendance', price: 0, type: 'reservation' }
+        ],
+        promoCodes: []
     },
     {
         id: '20',
@@ -388,8 +411,9 @@ export const events: Event[] = [
         organizer: 'Comedy Central',
         organizerId: 'user-4',
         ticketTiers: [
-            { id: 't20-1', name: 'General Admission', price: 20 }
-        ]
+            { id: 't20-1', name: 'General Admission', price: 20, type: 'paid' }
+        ],
+        promoCodes: []
     },
     {
         id: '21',
@@ -406,8 +430,9 @@ export const events: Event[] = [
         organizer: 'Readers Hub',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't21-1', name: 'Free Entry', price: 0 }
-        ]
+            { id: 't21-1', name: 'Free Entry', price: 0, type: 'reservation' }
+        ],
+        promoCodes: []
     },
     {
         id: '22',
@@ -424,7 +449,11 @@ export const events: Event[] = [
         organizer: 'Toronto Cares Foundation',
         organizerId: 'user-1',
         ticketTiers: [
-            { id: 't22-1', name: 'Runner Registration', price: 30 }
+            { id: 't22-1', name: 'Runner Registration', price: 30, type: 'paid' },
+            { id: 't22-2', name: 'Support Donation', price: 0, type: 'donation' }
+        ],
+        promoCodes: [
+            { code: 'RUNFORFUN', discountPercentage: 5 }
         ]
     },
     {
@@ -442,9 +471,10 @@ export const events: Event[] = [
         organizer: 'Film Enthusiasts Society',
         organizerId: 'user-3',
         ticketTiers: [
-            { id: 't23-1', name: 'Day Pass', price: 40 },
-            { id: 't23-2', name: 'Full Festival Pass', price: 150 }
-        ]
+            { id: 't23-1', name: 'Day Pass', price: 40, type: 'paid' },
+            { id: 't23-2', name: 'Full Festival Pass', price: 150, type: 'paid' }
+        ],
+        promoCodes: []
     }
 ];
 

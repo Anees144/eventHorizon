@@ -106,7 +106,7 @@ export default function CreateEventPage() {
                 <CardHeader>
                     <CardTitle>Ticket Tiers</CardTitle>
                     <CardDescription>
-                    Define pricing levels for your event tickets.
+                    Define pricing levels and types for your event tickets.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -114,6 +114,7 @@ export default function CreateEventPage() {
                     <TableHeader>
                         <TableRow>
                         <TableHead>Tier Name</TableHead>
+                        <TableHead>Type</TableHead>
                         <TableHead>Price</TableHead>
                         <TableHead>
                             <span className="sr-only">Actions</span>
@@ -122,40 +123,75 @@ export default function CreateEventPage() {
                     </TableHeader>
                     <TableBody>
                         <TableRow>
-                        <TableCell className="font-semibold">General Admission</TableCell>
-                        <TableCell>
-                            <Label htmlFor="price-1" className="sr-only">
-                            Price
-                            </Label>
-                            <Input id="price-1" type="number" defaultValue="25" />
-                        </TableCell>
-                        <TableCell>
-                            <Button
-                            aria-label="Delete"
-                            variant="outline"
-                            size="icon"
-                            >
-                            <PlusCircle className="h-4 w-4" />
-                            </Button>
-                        </TableCell>
+                            <TableCell className="font-semibold">General Admission</TableCell>
+                            <TableCell>
+                                 <Select defaultValue="paid">
+                                    <SelectTrigger aria-label="Select type">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="paid">Paid</SelectItem>
+                                        <SelectItem value="reservation">Reservation</SelectItem>
+                                        <SelectItem value="donation">Donation</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </TableCell>
+                            <TableCell>
+                                <Label htmlFor="price-1" className="sr-only">Price</Label>
+                                <Input id="price-1" type="number" defaultValue="25" />
+                            </TableCell>
+                            <TableCell>
+                                <Button aria-label="Delete" variant="outline" size="icon">
+                                <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </TableCell>
                         </TableRow>
                         <TableRow>
-                        <TableCell className="font-semibold">VIP Access</TableCell>
-                        <TableCell>
-                            <Label htmlFor="price-2" className="sr-only">
-                            Price
-                            </Label>
-                            <Input id="price-2" type="number" defaultValue="75" />
-                        </TableCell>
-                         <TableCell>
-                            <Button
-                            aria-label="Delete"
-                            variant="outline"
-                            size="icon"
-                            >
-                            <PlusCircle className="h-4 w-4" />
-                            </Button>
-                        </TableCell>
+                            <TableCell className="font-semibold">VIP Access</TableCell>
+                             <TableCell>
+                                 <Select defaultValue="paid">
+                                    <SelectTrigger aria-label="Select type">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="paid">Paid</SelectItem>
+                                        <SelectItem value="reservation">Reservation</SelectItem>
+                                        <SelectItem value="donation">Donation</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </TableCell>
+                            <TableCell>
+                                <Label htmlFor="price-2" className="sr-only">Price</Label>
+                                <Input id="price-2" type="number" defaultValue="75" />
+                            </TableCell>
+                            <TableCell>
+                                <Button aria-label="Delete" variant="outline" size="icon" >
+                                <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                         <TableRow>
+                            <TableCell className="font-semibold">Free Reservation</TableCell>
+                             <TableCell>
+                                 <Select defaultValue="reservation">
+                                    <SelectTrigger aria-label="Select type">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="paid">Paid</SelectItem>
+                                        <SelectItem value="reservation">Reservation</SelectItem>
+                                        <SelectItem value="donation">Donation</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </TableCell>
+                            <TableCell>
+                                <Input type="number" disabled value="0" />
+                            </TableCell>
+                            <TableCell>
+                                <Button aria-label="Delete" variant="outline" size="icon">
+                                <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                     </Table>
@@ -166,6 +202,44 @@ export default function CreateEventPage() {
                     Add Tier
                     </Button>
                 </CardFooter>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Promo Codes</CardTitle>
+                        <CardDescription>
+                        Create promotional codes to offer discounts.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead>Code</TableHead>
+                            <TableHead>Discount (%)</TableHead>
+                             <TableHead>
+                                <span className="sr-only">Actions</span>
+                            </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell><Input defaultValue="EARLYBIRD10" /></TableCell>
+                                <TableCell><Input type="number" defaultValue="10" /></TableCell>
+                                <TableCell>
+                                    <Button aria-label="Delete" variant="outline" size="icon" >
+                                    <PlusCircle className="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                        </Table>
+                    </CardContent>
+                     <CardFooter className="justify-center border-t p-4">
+                        <Button size="sm" variant="ghost" className="gap-1">
+                        <PlusCircle className="h-3.5 w-3.5" />
+                        Add Promo Code
+                        </Button>
+                    </CardFooter>
                 </Card>
             </div>
             <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
@@ -193,7 +267,7 @@ export default function CreateEventPage() {
                         <Label>Date</Label>
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="outline">Pick a date</Button>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal">Pick a date</Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                                 <Calendar mode="single" initialFocus />

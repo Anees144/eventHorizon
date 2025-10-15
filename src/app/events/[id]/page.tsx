@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
-import { CalendarDays, MapPin, User, Tag, MessageSquare } from 'lucide-react';
+import { CalendarDays, MapPin, User, Tag, MessageSquare, Ticket } from 'lucide-react';
 import { notFound, Link } from 'next/navigation';
 
 import { events } from '@/lib/data';
@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
+import type { TicketTier } from '@/lib/types';
 
 type EventPageProps = {
   params: {
@@ -26,17 +27,41 @@ type EventPageProps = {
 export default function EventPage({ params }: EventPageProps) {
   const event = events.find((e) => e.id === params.id);
   const [formattedDate, setFormattedDate] = useState('');
+  const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
 
   useEffect(() => {
     if (event) {
       const eventDate = parseISO(event.date);
       setFormattedDate(format(eventDate, 'EEEE, MMMM d, yyyy'));
+      if(event.ticketTiers.length > 0) {
+        setSelectedTier(event.ticketTiers[0]);
+      }
     }
   }, [event]);
 
   if (!event) {
     notFound();
   }
+
+  const handleTierChange = (tierId: string) => {
+    const tier = event.ticketTiers.find(t => t.id === tierId);
+    setSelectedTier(tier || null);
+  }
+
+  const getButtonText = () => {
+    if (!selectedTier) return "Select a ticket";
+    switch (selectedTier.type) {
+      case 'paid':
+        return `Checkout - $${selectedTier.price.toFixed(2)}`;
+      case 'reservation':
+        return 'Reserve Spot';
+      case 'donation':
+        return 'Make a Donation';
+      default:
+        return 'Get Tickets';
+    }
+  }
+
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
@@ -110,26 +135,40 @@ export default function EventPage({ params }: EventPageProps) {
 
               <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle className="font-headline text-xl">Get Your Tickets</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center gap-2"><Ticket /> Get Your Tickets</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <RadioGroup defaultValue={event.ticketTiers[0].id}>
+                    <RadioGroup defaultValue={event.ticketTiers[0]?.id} onValueChange={handleTierChange}>
                         {event.ticketTiers.map(tier => (
                             <div key={tier.id} className="flex items-center justify-between">
                                 <Label htmlFor={tier.id} className="flex items-center gap-3 cursor-pointer">
                                     <RadioGroupItem value={tier.id} id={tier.id} />
-                                    {tier.name}
+                                    <div className="grid gap-0.5">
+                                        <span className="font-semibold">{tier.name}</span>
+                                         {tier.type === 'donation' && <span className="text-xs text-muted-foreground">Pay what you want</span>}
+                                         {tier.type === 'reservation' && <span className="text-xs text-muted-foreground">Free reservation</span>}
+                                    </div>
                                 </Label>
-                                <span className="font-semibold">${tier.price.toFixed(2)}</span>
+                                {tier.type === 'paid' && <span className="font-semibold">${tier.price.toFixed(2)}</span>}
                             </div>
                         ))}
                     </RadioGroup>
+                    
+                    {selectedTier?.type === 'donation' && (
+                        <div className="grid gap-2">
+                            <Label htmlFor='donation-amount'>Donation Amount</Label>
+                            <Input id="donation-amount" type="number" placeholder="Enter amount" />
+                        </div>
+                    )}
+                    
                     <Separator />
                     <div className="flex gap-2">
                         <Input placeholder="Promo Code" />
                         <Button variant="secondary">Apply</Button>
                     </div>
-                    <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Checkout</Button>
+                    <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!selectedTier}>
+                        {getButtonText()}
+                    </Button>
                 </CardContent>
               </Card>
 
