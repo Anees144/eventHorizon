@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
-import { notFound, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -53,7 +53,9 @@ export default function EventPage() {
   }, [event]);
 
   if (!event) {
-    notFound();
+    return (
+      <div>Event not found.</div>
+    )
   }
   
   const handleSaveToggle = async () => {
@@ -162,7 +164,7 @@ export default function EventPage() {
                 <CardHeader>
                   <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <CardContent className="flex flex-col sm:flex-row gap-2">
                    <CalendarButton event={event} />
                    <ShareButton event={event} />
                 </CardContent>
