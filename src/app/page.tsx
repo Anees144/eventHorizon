@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -35,7 +36,6 @@ function EventList() {
           });
         },
         (error) => {
-          console.error("Error getting user location", error);
           // Fallback or default location if user denies permission
           setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
         }
