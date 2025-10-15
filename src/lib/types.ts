@@ -20,6 +20,8 @@ export type Event = {
   organizer: string;
   organizerId: string;
   ticketTiers: TicketTier[];
+  latitude: number;
+  longitude: number;
 };
 
 export type TicketTier = {
@@ -33,4 +35,5 @@ export type FilterState = {
     location: string;
     date: Date | null;
     search: string;
+    radius: number;
 }

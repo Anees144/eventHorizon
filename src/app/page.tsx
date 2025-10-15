@@ -9,17 +9,42 @@ import { EventCard } from '@/components/events/event-card';
 import EventFilters from '@/components/events/event-filters';
 import { MainHeader } from '@/components/layout/main-header';
 import type { FilterState, Event } from '@/lib/types';
+import { getDistance } from '@/lib/utils';
+
 
 function EventList() {
   const searchParams = useSearchParams();
   const [filteredEvents, setFilteredEvents] = useState<Event[]>(events);
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
 
   const [filters, setFilters] = useState<FilterState>({
     category: searchParams.get('category') ?? 'all',
     location: searchParams.get('location') ?? '',
     date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
     search: searchParams.get('search') ?? '',
+    radius: Number(searchParams.get('radius')) || 50,
   });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting user location", error);
+          // Fallback or default location if user denies permission
+          setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+        }
+      );
+    } else {
+        // Fallback for old browsers
+        setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+    }
+  }, []);
 
   useEffect(() => {
     setFilters({
@@ -27,6 +52,7 @@ function EventList() {
       location: searchParams.get('location') ?? '',
       date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
       search: searchParams.get('search') ?? '',
+      radius: Number(searchParams.get('radius')) || 50,
     });
   }, [searchParams]);
 
@@ -58,28 +84,43 @@ function EventList() {
               return false;
           }
       }
+
+      if (userLocation && event.latitude && event.longitude) {
+          const distance = getDistance(userLocation.lat, userLocation.lon, event.latitude, event.longitude);
+          if(distance > filters.radius) {
+              return false;
+          }
+      }
+      
       return true;
     });
     setFilteredEvents(newFilteredEvents);
-  }, [filters]);
+  }, [filters, userLocation]);
 
 
   return (
     <div className="container grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
-      {filteredEvents.map((event) => (
-        <EventCard key={event.id} event={event} />
-      ))}
+      {filteredEvents.length > 0 ? (
+        filteredEvents.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))
+      ) : (
+        <div className="col-span-full text-center text-muted-foreground py-10">
+          <p>No events match your criteria.</p>
+          <p>Try expanding your search radius or clearing some filters.</p>
+        </div>
+      )}
     </div>
   );
 }
 
 function HomePageContent() {
-  // This state is now managed inside EventList based on searchParams
   const [filters, setFilters] = useState<FilterState>({
     category: 'all',
     location: '',
     date: null,
     search: '',
+    radius: 50,
   });
 
   return (

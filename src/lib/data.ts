@@ -25,6 +25,8 @@ export const events: Event[] = [
         category: 'Music',
         date: '2024-08-15T20:00:00.000Z',
         location: 'Cyber City, Neo-Tokyo',
+        latitude: 35.6895,
+        longitude: 139.6917,
         organizer: 'RetroWave Productions',
         organizerId: 'user-1',
         ticketTiers: [
@@ -42,6 +44,8 @@ export const events: Event[] = [
         category: 'Technology',
         date: '2024-09-10T09:00:00.000Z',
         location: 'Innovation Hall, Silicon Valley',
+        latitude: 37.4013,
+        longitude: -122.122,
         organizer: 'TechForward',
         organizerId: 'user-2',
         ticketTiers: [
@@ -60,6 +64,8 @@ export const events: Event[] = [
         category: 'Art',
         date: '2024-07-20T10:00:00.000Z',
         location: 'The Modern Gallery, Paris',
+        latitude: 48.8566,
+        longitude: 2.3522,
         organizer: 'ArtConnect',
         organizerId: 'user-3',
         ticketTiers: [
@@ -76,6 +82,8 @@ export const events: Event[] = [
         category: 'Food',
         date: '2024-08-03T11:00:00.000Z',
         location: 'Waterfront Park, New York',
+        latitude: 40.7128,
+        longitude: -74.0060,
         organizer: 'TasteMakers Inc.',
         organizerId: 'user-1',
         ticketTiers: [
@@ -93,6 +101,8 @@ export const events: Event[] = [
         category: 'Business',
         date: '2024-10-05T18:00:00.000Z',
         location: 'The Enterprise Hub, London',
+        latitude: 51.5074,
+        longitude: -0.1278,
         organizer: 'Innovate UK',
         organizerId: 'user-2',
         ticketTiers: [
@@ -110,6 +120,8 @@ export const events: Event[] = [
         category: 'Wellness',
         date: '2024-09-27T16:00:00.000Z',
         location: 'Serenity Gardens, Bali',
+        latitude: -8.3405,
+        longitude: 115.0920,
         organizer: 'ZenLife',
         organizerId: 'user-3',
         ticketTiers: [
@@ -126,6 +138,8 @@ export const events: Event[] = [
         category: 'Music',
         date: '2024-09-21T14:00:00.000Z',
         location: 'Greenfield Park, Austin',
+        latitude: 30.2672,
+        longitude: -97.7431,
         organizer: 'SoundWave Events',
         organizerId: 'user-1',
         ticketTiers: [
@@ -143,6 +157,8 @@ export const events: Event[] = [
         category: 'Technology',
         date: '2024-11-12T09:00:00.000Z',
         location: 'Virtual Event',
+        latitude: 34.0522,
+        longitude: -118.2437,
         organizer: 'CryptoCon',
         organizerId: 'user-2',
         ticketTiers: [
@@ -160,6 +176,8 @@ export const events: Event[] = [
         category: 'Art',
         date: '2024-08-22T19:30:00.000Z',
         location: 'The Grand Stage, New York',
+        latitude: 40.758,
+        longitude: -73.9855,
         organizer: 'Modern Bard Company',
         organizerId: 'user-3',
         ticketTiers: [
@@ -177,6 +195,8 @@ export const events: Event[] = [
         category: 'Sports',
         date: '2024-09-14T18:00:00.000Z',
         location: 'The Arena, Los Angeles',
+        latitude: 34.043,
+        longitude: -118.2673,
         organizer: 'National Basketball League',
         organizerId: 'user-4',
         ticketTiers: [
@@ -195,10 +215,161 @@ export const events: Event[] = [
         category: 'Community',
         date: '2024-08-17T09:00:00.000Z',
         location: 'Central Park, Springfield',
+        latitude: 39.7817,
+        longitude: -89.6501,
         organizer: 'Springfield Action Committee',
         organizerId: 'user-1',
         ticketTiers: [
             { id: 't11-1', name: 'Volunteer (Free)', price: 0 },
+        ]
+    },
+    {
+        id: '12',
+        title: 'E-Sports Grand Finals',
+        description: 'The world\'s best gamers compete for the championship title.',
+        richDescription: '<p>Feel the hype at the <strong>E-Sports Grand Finals</strong>! Watch pro players display incredible skill and strategy in the most popular competitive games. Live commentary, merchandise, and more.</p>',
+        imageUrl: getImage('tech conference').imageUrl,
+        imageHint: 'tech conference',
+        category: 'Technology',
+        date: '2024-09-28T12:00:00Z',
+        location: 'Seoul e-Stadium, South Korea',
+        latitude: 37.505,
+        longitude: 127.075,
+        organizer: 'Global Gaming League',
+        organizerId: 'user-2',
+        ticketTiers: [
+            { id: 't12-1', name: 'Floor Seats', price: 50 },
+            { id: 't12-2', name: 'Stadium Seating', price: 30 }
+        ]
+    },
+    {
+        id: '13',
+        title: 'Jazz Under the Stars',
+        description: 'An open-air jazz concert featuring local and international artists.',
+        richDescription: '<p>Relax to the smooth sounds of <strong>Jazz Under the Stars</strong>. This magical evening features a lineup of talented jazz musicians in a beautiful outdoor amphitheater. Bring a blanket and enjoy the show.</p>',
+        imageUrl: getImage('music concert').imageUrl,
+        imageHint: 'music concert',
+        category: 'Music',
+        date: '2024-08-30T19:00:00Z',
+        location: 'Moonlight Amphitheater, Chicago',
+        latitude: 41.8781,
+        longitude: -87.6298,
+        organizer: 'Chicago Jazz Society',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't13-1', name: 'Lawn Seating', price: 25 },
+            { id: 't13-2', name: 'Reserved Chair', price: 45 }
+        ]
+    },
+    {
+        id: '14',
+        title: 'Street Art Tour',
+        description: 'A walking tour of the city\'s most vibrant street art and murals.',
+        richDescription: '<p>Discover the hidden artistic gems of the city on our <strong>Street Art Tour</strong>. A local artist will guide you through alleys and streets, explaining the stories and techniques behind the incredible murals.</p>',
+        imageUrl: getImage('art exhibition').imageUrl,
+        imageHint: 'art exhibition',
+        category: 'Art',
+        date: '2024-09-07T14:00:00Z',
+        location: 'Shoreditch, London',
+        latitude: 51.5229,
+        longitude: -0.0754,
+        organizer: 'Urban Canvas Tours',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't14-1', name: 'Adult', price: 20 },
+            { id: 't14-2', name: 'Student', price: 15 }
+        ]
+    },
+    {
+        id: '15',
+        title: 'Gourmet Chocolate Making',
+        description: 'Learn the art of chocolate making from a master chocolatier.',
+        richDescription: '<p>Indulge your sweet tooth and learn a new skill at our <strong>Gourmet Chocolate Making</strong> workshop. You\'ll learn tempering, molding, and flavoring techniques to create your own delicious confections to take home.</p>',
+        imageUrl: getImage('food festival').imageUrl,
+        imageHint: 'food festival',
+        category: 'Food',
+        date: '2024-10-12T13:00:00Z',
+        location: 'The Cocoa Bean, Brussels',
+        latitude: 50.8503,
+        longitude: 4.3517,
+        organizer: 'Belgian Chocolate School',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't15-1', name: 'Workshop Fee', price: 80 }
+        ]
+    },
+    {
+        id: '16',
+        title: 'Women in Leadership Conference',
+        description: 'An empowering conference for women in the business world.',
+        richDescription: '<p>The <strong>Women in Leadership Conference</strong> brings together leaders, entrepreneurs, and executives to share their stories, insights, and strategies for success. Network with peers and get inspired to take your career to the next level.</p>',
+        imageUrl: getImage('business seminar').imageUrl,
+        imageHint: 'business seminar',
+        category: 'Business',
+        date: '2024-11-08T09:00:00Z',
+        location: 'Metropolitan Conference Center, NYC',
+        latitude: 40.7549,
+        longitude: -73.984,
+        organizer: 'LeadHers Network',
+        organizerId: 'user-2',
+        ticketTiers: [
+            { id: 't16-1', name: 'Early Bird', price: 250 },
+            { id: 't16-2', name: 'General Admission', price: 350 }
+        ]
+    },
+    {
+        id: '17',
+        title: 'Digital Detox Weekend',
+        description: 'Disconnect to reconnect. A weekend getaway without screens.',
+        richDescription: '<p>Join our <strong>Digital Detox Weekend</strong> to unplug from technology and reconnect with yourself, others, and nature. Activities include hiking, campfires, journaling, and group discussions. All phones and devices will be securely stored for the duration.</p>',
+        imageUrl: getImage('yoga workshop').imageUrl,
+        imageHint: 'yoga workshop',
+        category: 'Wellness',
+        date: '2024-08-23T18:00:00Z',
+        location: 'Redwood National Park, California',
+        latitude: 41.2132,
+        longitude: -124.0046,
+        organizer: 'The Unplugged Movement',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't17-1', name: 'Shared Cabin', price: 300 },
+            { id: 't17-2', name: 'Private Cabin', price: 450 }
+        ]
+    },
+    {
+        id: '18',
+        title: 'Beach Volleyball Tournament',
+        description: 'Sun, sand, and spikes! A friendly beach volleyball competition.',
+        richDescription: '<p>Get your team together for our annual <strong>Beach Volleyball Tournament</strong>. All skill levels are welcome, from beginners to seasoned players. Prizes for the winning team and a beach party to follow.</p>',
+        imageUrl: getImage('sports game').imageUrl,
+        imageHint: 'sports game',
+        category: 'Sports',
+        date: '2024-07-27T10:00:00Z',
+        location: 'Santa Monica Beach, CA',
+        latitude: 34.0194,
+        longitude: -118.4912,
+        organizer: 'SoCal Sports League',
+        organizerId: 'user-4',
+        ticketTiers: [
+            { id: 't18-1', name: 'Team Registration (4 players)', price: 100 }
+        ]
+    },
+    {
+        id: '19',
+        title: 'Neighborhood Watch Meeting',
+        description: 'Discuss community safety and initiatives with your neighbors.',
+        richDescription: '<p>Join your neighbors for the monthly <strong>Neighborhood Watch Meeting</strong>. We will discuss recent activity, crime prevention tips, and upcoming community events. Your participation is key to a safer neighborhood for everyone.</p>',
+        imageUrl: getImage('community meetup').imageUrl,
+        imageHint: 'community meetup',
+        category: 'Community',
+        date: '2024-08-05T19:00:00Z',
+        location: 'Community Hall, Maplewood',
+        latitude: 40.7303,
+        longitude: -74.2757,
+        organizer: 'Maplewood Safety Alliance',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't19-1', name: 'Attendance', price: 0 }
         ]
     }
 ];

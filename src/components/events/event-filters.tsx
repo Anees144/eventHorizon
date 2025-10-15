@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, MapPin, Search, Tag, X } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Search, Tag, X, LocateFixed } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { categories } from '@/lib/data';
@@ -24,6 +24,8 @@ import {
 import { Card, CardContent } from '../ui/card';
 import type { FilterState } from '@/lib/types';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Slider } from '../ui/slider';
+import { Label } from '../ui/label';
 
 type EventFiltersProps = {
   onFilterChange: (filters: FilterState) => void;
@@ -38,8 +40,7 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
   const [date, setDate] = useState<Date | undefined>(
     searchParams.get('date') ? new Date(searchParams.get('date')!) : undefined
   );
-  
-  // This state is not directly used for filtering here, but is part of FilterState
+  const [radius, setRadius] = useState(Number(searchParams.get('radius')) || 50);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
 
   useEffect(() => {
@@ -47,14 +48,15 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
         category,
         location,
         date: date ?? null,
-        search: search,
+        search,
+        radius,
     })
-  }, [category, location, date, search, onFilterChange]);
+  }, [category, location, date, search, radius, onFilterChange]);
 
-  const updateQueryParam = (key: string, value: string | null) => {
+  const updateQueryParam = (key: string, value: string | number | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value && value !== 'all') {
-      params.set(key, value);
+      params.set(key, String(value));
     } else {
       params.delete(key);
     }
@@ -77,21 +79,29 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
     updateQueryParam('date', selectedDate ? selectedDate.toISOString().split('T')[0] : null);
   }
   
+  const handleRadiusChange = (value: number[]) => {
+    setRadius(value[0]);
+    updateQueryParam('radius', value[0]);
+  }
+
   const handleClearFilters = () => {
     setCategory('all');
     setLocation('');
     setDate(undefined);
+    setRadius(50);
+    setSearch('');
     router.push('?');
   }
 
   return (
     <Card className="z-10 shadow-lg">
       <CardContent className="p-4">
-        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-4 lg:grid-cols-[1fr_1fr_1fr_auto_auto]">
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-[2fr_2fr_2fr_3fr_1fr]">
           <div className="relative">
-            <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+             <Label htmlFor='category-select'>Category</Label>
+            <Tag className="absolute left-3 top-[2.4rem] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Select value={category} onValueChange={handleCategoryChange}>
-              <SelectTrigger className="w-full pl-9">
+              <SelectTrigger id="category-select" className="w-full pl-9">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -105,8 +115,10 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
             </Select>
           </div>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+             <Label htmlFor='location-input'>Location</Label>
+            <MapPin className="absolute left-3 top-[2.4rem] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input 
+                id="location-input"
                 placeholder="Location" 
                 className="pl-9"
                 value={location}
@@ -114,6 +126,7 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
             />
           </div>
           <div className="relative">
+            <Label>Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -132,11 +145,11 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
               </PopoverContent>
             </Popover>
           </div>
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 md:w-auto" disabled>
-            <Search className="mr-2 h-4 w-4" />
-            Find Events
-          </Button>
-           <Button variant="ghost" onClick={handleClearFilters} className="w-full text-muted-foreground md:w-auto">
+            <div className="space-y-3">
+                 <Label>Radius ({radius} km)</Label>
+                <Slider defaultValue={[radius]} max={200} step={5} onValueChange={handleRadiusChange} />
+            </div>
+           <Button variant="ghost" onClick={handleClearFilters} className="w-full text-muted-foreground">
             <X className="mr-2 h-4 w-4" />
             Clear
           </Button>
