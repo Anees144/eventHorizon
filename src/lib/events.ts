@@ -22,8 +22,6 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         location: eventData.location,
         imageUrl: eventData.imageUrl,
         imageHint: eventData.imageHint,
-        videoUrl: eventData.videoUrl,
-        tags: eventData.tags,
         visibility: eventData.visibility,
         date: eventData.date ? new Date(eventData.date) : serverTimestamp(),
         ticketTiers: eventData.ticketTiers,
@@ -33,13 +31,15 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         latitude: eventData.latitude,
         longitude: eventData.longitude,
     };
+    
+    if (eventData.videoUrl) {
+      dataToSave.videoUrl = eventData.videoUrl;
+    }
+    
+    if (eventData.tags && eventData.tags.length > 0) {
+      dataToSave.tags = eventData.tags;
+    }
 
-    // Clean the object: remove any keys with undefined values before sending to Firestore.
-    Object.keys(dataToSave).forEach(key => {
-        if (dataToSave[key] === undefined) {
-            delete dataToSave[key];
-        }
-    });
 
     const docRef = await addDoc(eventsCollection, dataToSave);
     return docRef.id;
