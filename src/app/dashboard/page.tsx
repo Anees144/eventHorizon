@@ -12,6 +12,7 @@ import {
   Search,
   Users,
 } from "lucide-react"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 import {
   Avatar,
@@ -37,14 +38,24 @@ import {
 } from "@/components/ui/table"
 import { events, user } from "@/lib/data"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import type { Event } from "@/lib/types";
 
-type EventWithFormattedDate = typeof events[0] & {
+type EventWithFormattedDate = Event & {
     formattedDate: string;
     formattedDistance: string;
     isUpcoming: boolean;
 };
+
+const revenueData = [
+    { month: "Jan", revenue: 4500 },
+    { month: "Feb", revenue: 4200 },
+    { month: "Mar", revenue: 5000 },
+    { month: "Apr", revenue: 3800 },
+    { month: "May", revenue: 6200 },
+    { month: "Jun", revenue: 5800 },
+];
 
 function DashboardPageContent() {
     const searchParams = useSearchParams();
@@ -70,11 +81,34 @@ function DashboardPageContent() {
                     ...event,
                     formattedDate: format(eventDate, 'MMM d, yyyy'),
                     isUpcoming: eventDate > new Date(),
-                    formattedDistance: formatDistanceToNow(eventDate),
+                    formattedDistance: formatDistanceToNow(eventDate, { addSuffix: true }),
                 };
             });
         setUserEvents(processedEvents);
     }, [searchTerm]);
+
+    const { totalRevenue, ticketsSold, activeEventsCount } = useMemo(() => {
+        let revenue = 0;
+        let tickets = 0;
+        let active = 0;
+        
+        userEvents.forEach(event => {
+            // A mock calculation for revenue and tickets.
+            // In a real app, this would come from a database.
+            const eventRevenue = event.ticketTiers.reduce((acc, tier) => acc + tier.price * 50, 0); // Assume 50 tickets sold per tier
+            const eventTickets = event.ticketTiers.length * 50;
+            revenue += eventRevenue;
+            tickets += eventTickets;
+            if (event.isUpcoming) {
+                active++;
+            }
+        });
+        return {
+            totalRevenue: revenue,
+            ticketsSold: tickets,
+            activeEventsCount: active
+        };
+    }, [userEvents]);
 
 
   return (
@@ -88,9 +122,9 @@ function DashboardPageContent() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
+              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                +20.1% from last month
+                From all your events
               </p>
             </CardContent>
           </Card>
@@ -102,9 +136,9 @@ function DashboardPageContent() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
+              <div className="text-2xl font-bold">+{ticketsSold.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                +180.1% from last month
+                Across all events
               </p>
             </CardContent>
           </Card>
@@ -114,9 +148,9 @@ function DashboardPageContent() {
               <CalendarClock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+5</div>
+              <div className="text-2xl font-bold">+{activeEventsCount}</div>
               <p className="text-xs text-muted-foreground">
-                +2 since last month
+                Your upcoming events
               </p>
             </CardContent>
           </Card>
@@ -135,49 +169,66 @@ function DashboardPageContent() {
             </CardContent>
           </Card>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>My Events</CardTitle>
-            <CardDescription>
-              A list of events you are organizing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Date
-                  </TableHead>
-                  <TableHead className="text-right">Sales</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {userEvents.map(event => (
-                     <TableRow key={event.id}>
-                     <TableCell>
-                       <div className="font-medium">{event.title}</div>
-                       <div className="hidden text-sm text-muted-foreground md:inline">
-                         {event.location}
-                       </div>
-                     </TableCell>
-                     <TableCell>
-                       <Badge variant={event.isUpcoming ? 'outline' : 'destructive'}>
-                        {event.isUpcoming ? `Upcoming in ${event.formattedDistance}` : 'Finished'}
-                       </Badge>
-                     </TableCell>
-                     <TableCell className="hidden md:table-cell">
-                       {event.formattedDate}
-                     </TableCell>
-                     <TableCell className="text-right">$2,500.00</TableCell>
-                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-1 lg:col-span-4">
+            <CardHeader>
+                <CardTitle>My Events</CardTitle>
+                <CardDescription>
+                A list of events you are organizing.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                        Date
+                    </TableHead>
+                    <TableHead className="text-right">Sales</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {userEvents.map(event => (
+                        <TableRow key={event.id}>
+                        <TableCell>
+                        <div className="font-medium">{event.title}</div>
+                        <div className="hidden text-sm text-muted-foreground md:inline">
+                            {event.location}
+                        </div>
+                        </TableCell>
+                        <TableCell>
+                        <Badge variant={event.isUpcoming ? 'outline' : 'secondary'}>
+                            {event.isUpcoming ? `Upcoming ${event.formattedDistance}` : 'Finished'}
+                        </Badge>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                        {event.formattedDate}
+                        </TableCell>
+                        <TableCell className="text-right">${(event.ticketTiers.reduce((acc, tier) => acc + tier.price * 50, 0)).toLocaleString()}</TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody>
+                </Table>
+            </CardContent>
+            </Card>
+            <Card className="col-span-1 lg:col-span-3">
+              <CardHeader>
+                <CardTitle>Revenue Overview</CardTitle>
+                <CardDescription>A summary of your earnings over the past 6 months.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={revenueData}>
+                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value / 1000}k`} />
+                    <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+        </div>
     </>
   )
 }
