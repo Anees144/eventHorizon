@@ -57,7 +57,13 @@ function EventList() {
   }, [searchParams]);
 
   useEffect(() => {
+    const now = new Date();
     const newFilteredEvents = events.filter((event) => {
+      const eventDate = event.date ? new Date(event.date) : null;
+      if (!eventDate || eventDate < now) {
+          return false;
+      }
+
       const searchLower = filters.search.toLowerCase();
       if (
         filters.search &&
@@ -76,7 +82,6 @@ function EventList() {
         return false;
       }
       if (filters.date) {
-          const eventDate = new Date(event.date);
           const filterDate = filters.date;
           if (eventDate.getFullYear() !== filterDate.getFullYear() ||
               eventDate.getMonth() !== filterDate.getMonth() ||
