@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
 import type { TicketTier, UserProfile } from '@/lib/types';
 import { CalendarButton } from '@/components/events/calendar-button';
+import { ShareButton } from '@/components/events/share-button';
 
 export default function EventPage() {
   const params = useParams();
@@ -159,10 +160,11 @@ export default function EventPage() {
               
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Add to Calendar</CardTitle>
+                  <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="grid grid-cols-2 gap-2">
                    <CalendarButton event={event} />
+                   <ShareButton event={event} />
                 </CardContent>
               </Card>
 
