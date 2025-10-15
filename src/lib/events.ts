@@ -32,7 +32,7 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         longitude: eventData.longitude,
     };
     
-    if (eventData.videoUrl) {
+    if (eventData.videoUrl && eventData.videoUrl.trim() !== '') {
       dataToSave.videoUrl = eventData.videoUrl;
     }
     
