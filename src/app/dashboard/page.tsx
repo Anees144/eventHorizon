@@ -1,3 +1,5 @@
+
+'use client';
 import Link from "next/link"
 import {
   ArrowUpRight,
@@ -34,10 +36,33 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { events, user } from "@/lib/data"
-import { format, formatDistanceToNow } from "date-fns"
+import { format, formatDistanceToNow, parseISO } from "date-fns"
+import { useEffect, useState } from "react";
+
+type EventWithFormattedDate = typeof events[0] & {
+    formattedDate: string;
+    formattedDistance: string;
+    isUpcoming: boolean;
+};
 
 export default function DashboardPage() {
-    const userEvents = events.filter(e => e.organizerId === user.id);
+    const [userEvents, setUserEvents] = useState<EventWithFormattedDate[]>([]);
+
+    useEffect(() => {
+        const processedEvents = events
+            .filter(e => e.organizerId === user.id)
+            .map(event => {
+                const eventDate = parseISO(event.date);
+                return {
+                    ...event,
+                    formattedDate: format(eventDate, 'MMM d, yyyy'),
+                    isUpcoming: eventDate > new Date(),
+                    formattedDistance: formatDistanceToNow(eventDate),
+                };
+            });
+        setUserEvents(processedEvents);
+    }, []);
+
 
   return (
     <>
@@ -126,12 +151,12 @@ export default function DashboardPage() {
                        </div>
                      </TableCell>
                      <TableCell>
-                       <Badge variant={new Date(event.date) > new Date() ? 'outline' : 'destructive'}>
-                        {new Date(event.date) > new Date() ? `Upcoming in ${formatDistanceToNow(new Date(event.date))}` : 'Finished'}
+                       <Badge variant={event.isUpcoming ? 'outline' : 'destructive'}>
+                        {event.isUpcoming ? `Upcoming in ${event.formattedDistance}` : 'Finished'}
                        </Badge>
                      </TableCell>
                      <TableCell className="hidden md:table-cell">
-                       {format(new Date(event.date), 'MMM d, yyyy')}
+                       {event.formattedDate}
                      </TableCell>
                      <TableCell className="text-right">$2,500.00</TableCell>
                    </TableRow>

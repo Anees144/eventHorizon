@@ -1,5 +1,8 @@
+
+'use client';
+
 import Image from 'next/image';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { CalendarDays, MapPin, User, Tag } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -12,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useEffect, useState } from 'react';
 
 type EventPageProps = {
   params: {
@@ -21,6 +25,13 @@ type EventPageProps = {
 
 export default function EventPage({ params }: EventPageProps) {
   const event = events.find((e) => e.id === params.id);
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    if (event) {
+      setFormattedDate(format(parseISO(event.date), 'EEEE, MMMM d, yyyy'));
+    }
+  }, [event]);
 
   if (!event) {
     notFound();
@@ -64,7 +75,7 @@ export default function EventPage({ params }: EventPageProps) {
                 <CardContent className="space-y-2 text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-5 w-5" />
-                    <span>{format(new Date(event.date), 'EEEE, MMMM d, yyyy')}</span>
+                    <span>{formattedDate}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
