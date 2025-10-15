@@ -164,7 +164,7 @@ export default function EventPage() {
                 <CardHeader>
                   <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <CardContent className="grid grid-cols-1 gap-2">
                    <CalendarButton event={event} />
                    <ShareButton event={event} />
                 </CardContent>
