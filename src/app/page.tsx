@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -9,7 +8,6 @@ import { ArrowRight, Sparkles, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import type { DateRange } from 'react-day-picker';
 
-import { events } from '@/lib/data';
 import { EventCard } from '@/components/events/event-card';
 import EventFilters from '@/components/events/event-filters';
 import { MainHeader } from '@/components/layout/main-header';
@@ -19,9 +17,10 @@ import { getRecommendedEventsAction } from './dashboard/recommendations/actions'
 import { Button } from '@/components/ui/button';
 import { EventCarousel } from '@/components/events/event-carousel';
 import { CompareButton } from '@/components/events/compare-button';
+import { getEvents } from '@/lib/events';
 
 
-function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId: string, isSelected: boolean) => void; compareList: string[] }) {
+function EventList({ onCompareChange, compareList, allEvents }: { onCompareChange: (eventId: string, isSelected: boolean) => void; compareList: string[], allEvents: Event[] }) {
   const searchParams = useSearchParams();
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
@@ -80,8 +79,8 @@ function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId
   }, [searchParams]);
 
   useEffect(() => {
-    const newFilteredEvents = events.filter((event) => {
-      const eventDate = event.date ? new Date(event.date) : null;
+    const newFilteredEvents = allEvents.filter((event) => {
+      const eventDate = event.date ? new Date(event.date as string) : null;
 
       const searchLower = filters.search.toLowerCase();
       if (
@@ -107,12 +106,12 @@ function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId
           if (!eventDate) return false;
           const fromDate = new Date(filters.date.from);
           fromDate.setHours(0,0,0,0);
-          // Don't filter out past events
-          // if (eventDate < fromDate) return false; 
           if (filters.date.to) {
               const toDate = new Date(filters.date.to);
               toDate.setHours(23,59,59,999);
-              if (eventDate > toDate) return false;
+              if (eventDate < fromDate || eventDate > toDate) return false;
+          } else {
+              if (eventDate < fromDate) return false;
           }
       }
 
@@ -133,7 +132,7 @@ function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId
       return true;
     });
     setFilteredEvents(newFilteredEvents);
-  }, [filters, userLocation]);
+  }, [filters, userLocation, allEvents]);
 
 
   return (
@@ -158,6 +157,7 @@ function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId
 }
 
 function HomePageContent() {
+    const [allEvents, setAllEvents] = useState<Event[]>([]);
     const [filters, setFilters] = useState<FilterState>({
         category: 'all',
         location: '',
@@ -168,52 +168,63 @@ function HomePageContent() {
     });
     const [recommendedEvents, setRecommendedEvents] = useState<Event[] | null>(null);
     const [nearbyEvents, setNearbyEvents] = useState<Event[]>([]);
-    const [trendingEvents] = useState<Event[]>(() => events.slice(0, 5));
+    const [trendingEvents, setTrendingEvents] = useState<Event[]>([]);
     const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
     const [compareList, setCompareList] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const handleCompareChange = (eventId: string, isSelected: boolean) => {
         setCompareList(prev => 
             isSelected ? [...prev, eventId] : prev.filter(id => id !== eventId)
         );
     };
-
+    
     useEffect(() => {
-        getRecommendedEventsAction().then(result => {
-            if (result.recommendedEvents) {
-                setRecommendedEvents(result.recommendedEvents);
-            }
-        });
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserLocation({
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude,
-                    });
-                },
-                () => {
-                    setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+        async function fetchEvents() {
+            setLoading(true);
+            const eventsFromDb = await getEvents();
+            setAllEvents(eventsFromDb);
+            setTrendingEvents(eventsFromDb.slice(0, 5));
+            
+            getRecommendedEventsAction(eventsFromDb).then(result => {
+                if (result.recommendedEvents) {
+                    setRecommendedEvents(result.recommendedEvents);
                 }
-            );
-        } else {
-            setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+            });
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const location = {
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude,
+                        };
+                        setUserLocation(location);
+                        const nearby = eventsFromDb.filter(event => {
+                            if (event.latitude && event.longitude) {
+                                const distance = getDistance(location.lat, location.lon, event.latitude, event.longitude);
+                                return distance < 50;
+                            }
+                            return false;
+                        });
+                        setNearbyEvents(nearby);
+                    },
+                    () => {
+                        setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+                    }
+                );
+            } else {
+                setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+            }
+
+            setLoading(false);
         }
+        fetchEvents();
     }, []);
 
-    useEffect(() => {
-        if (userLocation) {
-            const nearby = events.filter(event => {
-                if (event.latitude && event.longitude) {
-                    const distance = getDistance(userLocation.lat, userLocation.lon, event.latitude, event.longitude);
-                    return distance < 50; // 50km radius for nearby
-                }
-                return false;
-            });
-            setNearbyEvents(nearby);
-        }
-    }, [userLocation]);
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen">Loading events...</div>
+    }
 
 
     return (
@@ -302,7 +313,7 @@ function HomePageContent() {
                     <div className="container mb-8">
                         <h2 className="font-headline text-3xl font-bold">All Events</h2>
                     </div>
-                    <EventList onCompareChange={handleCompareChange} compareList={compareList} />
+                    <EventList onCompareChange={handleCompareChange} compareList={compareList} allEvents={allEvents} />
                 </section>
 
             </main>

@@ -1,27 +1,41 @@
-
 'use client';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Event, UserProfile } from '@/lib/types';
-import { events } from '@/lib/data';
 import { EventCard } from '@/components/events/event-card';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Bookmark } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getEvents } from '@/lib/events';
 
 export default function SavedEventsPage() {
   const { user } = useUser();
   const firestore = useFirestore();
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  useEffect(() => {
+    async function fetchEvents() {
+        setLoadingEvents(true);
+        const events = await getEvents();
+        setAllEvents(events);
+        setLoadingEvents(false);
+    }
+    fetchEvents();
+  }, []);
 
   const userProfileRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'users', user.uid) : null),
     [user, firestore]
   );
-  const { data: userProfile, isLoading } = useDoc<UserProfile>(userProfileRef);
+  const { data: userProfile, isLoading: isLoadingProfile } = useDoc<UserProfile>(userProfileRef);
 
   const savedEvents = userProfile?.savedEvents
-    ? events.filter((event) => userProfile.savedEvents?.includes(event.id))
+    ? allEvents.filter((event) => userProfile.savedEvents?.includes(event.id))
     : [];
+    
+  const isLoading = isLoadingProfile || loadingEvents;
 
   return (
     <div className="container mx-auto py-8">
@@ -53,7 +67,7 @@ export default function SavedEventsPage() {
             {!isLoading && savedEvents.length > 0 && (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {savedEvents.map((event) => (
-                        <EventCard key={event.id} event={event} />
+                        <EventCard key={event.id} event={event} onCompareChange={()=>{}} isComparing={false} />
                     ))}
                 </div>
             )}

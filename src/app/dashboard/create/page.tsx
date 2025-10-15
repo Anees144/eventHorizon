@@ -1,9 +1,8 @@
-
-
 'use client';
 
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   PlusCircle,
@@ -61,9 +60,16 @@ import type { TicketTier, PromoCode, Event } from "@/lib/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { VideoEmbed } from "@/components/events/video-embed";
+import { useUser } from "@/firebase";
+import { createEvent } from "@/lib/events";
+import { useToast } from "@/hooks/use-toast";
 
 
 export default function CreateEventPage() {
+  const router = useRouter();
+  const { user } = useUser();
+  const { toast } = useToast();
+
   const [title, setTitle] = useState('Synthwave Night');
   const [description, setDescription] = useState('Dive into the retro-futuristic sounds of synthwave with top DJs.');
   const [richDescription, setRichDescription] = useState('<p>Join us for an electrifying night of retro-futuristic sounds. <strong>Synthwave Night</strong> brings together the best DJs in the genre for an unforgettable audio-visual experience.</p>');
@@ -84,6 +90,57 @@ export default function CreateEventPage() {
     { code: 'EARLYBIRD10', discountPercentage: 10 },
   ]);
   const [selectedTier, setSelectedTier] = useState<Partial<TicketTier> | null>(ticketTiers.length > 0 ? ticketTiers[0] : null);
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveEvent = async () => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not logged in",
+            description: "You must be logged in to create an event.",
+        });
+        return;
+    }
+    setIsSaving(true);
+    try {
+        const eventData = {
+            title,
+            description,
+            richDescription,
+            category,
+            location,
+            imageUrl,
+            imageHint,
+            videoUrl,
+            tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+            visibility,
+            date,
+            ticketTiers: ticketTiers as TicketTier[],
+            promoCodes: promoCodes as PromoCode[],
+            organizerId: user.uid,
+            organizer: user.displayName || user.email || "Anonymous",
+            latitude: 40.7128, // Placeholder
+            longitude: -74.006, // Placeholder
+        };
+        const newEventId = await createEvent(eventData);
+        toast({
+            title: "Event Created!",
+            description: "Your event has been successfully saved.",
+        });
+        router.push(`/events/${newEventId}`);
+    } catch (error) {
+        console.error("Failed to create event:", error);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to create event. Please try again.",
+        });
+    } finally {
+        setIsSaving(false);
+    }
+  }
+
 
   const addTier = () => {
     setTicketTiers([...ticketTiers, { name: '', type: 'paid', price: 0 }]);
@@ -153,10 +210,12 @@ export default function CreateEventPage() {
             </h1>
         </div>
         <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-            Discard
+            <Button variant="outline" size="sm" onClick={() => router.push('/dashboard')}>
+                Discard
             </Button>
-            <Button size="sm">Save Event</Button>
+            <Button size="sm" onClick={handleSaveEvent} disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Event'}
+            </Button>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

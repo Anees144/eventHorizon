@@ -1,6 +1,7 @@
-
+'use client';
 
 import type { DateRange } from "react-day-picker";
+import type { Timestamp } from 'firebase/firestore';
 
 export type User = {
   id: string;
@@ -27,7 +28,7 @@ export type Event = {
   imageHint: string;
   videoUrl?: string;
   category: string;
-  date: string;
+  date: string | Date | Timestamp;
   location: string;
   organizer: string;
   organizerId: string;

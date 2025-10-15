@@ -1,9 +1,8 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MainHeader } from '@/components/layout/main-header';
-import { events } from '@/lib/data';
 import type { Event } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
@@ -12,11 +11,39 @@ import { format, parseISO } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getEventById } from '@/lib/events';
 
 function ComparePageContent() {
   const searchParams = useSearchParams();
   const ids = searchParams.get('ids')?.split(',') || [];
-  const comparedEvents: Event[] = events.filter((event) => ids.includes(event.id));
+  const [comparedEvents, setComparedEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      setLoading(true);
+      const eventPromises = ids.map(id => getEventById(id));
+      const eventsData = await Promise.all(eventPromises);
+      setComparedEvents(eventsData.filter((e): e is Event => e !== null));
+      setLoading(false);
+    }
+    if (ids.length > 0) {
+      fetchEvents();
+    } else {
+      setLoading(false);
+    }
+  }, [ids]);
+
+  if (loading) {
+    return (
+        <div className="flex min-h-screen w-full flex-col bg-background">
+            <MainHeader />
+            <main className="flex-1 py-8">
+                <div className="container px-4 md:px-6 text-center">Loading comparison...</div>
+            </main>
+        </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
@@ -50,7 +77,7 @@ function ComparePageContent() {
                         <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <CalendarDays className="h-4 w-4" />
-                            <span>{format(parseISO(event.date), 'MMM d, yyyy')}</span>
+                            <span>{format(parseISO(event.date as string), 'MMM d, yyyy')}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
@@ -59,7 +86,7 @@ function ComparePageContent() {
                           <div className="flex items-center gap-2">
                             <Ticket className="h-4 w-4" />
                             <span>
-                              {event.ticketTiers.length > 0
+                              {event.ticketTiers.length > 0 && event.ticketTiers.some(t => t.type === 'paid')
                                 ? `$${Math.min(...event.ticketTiers.filter(t => t.type === 'paid').map(t => t.price))}` + (event.ticketTiers.some(t => t.type !== 'paid') ? ' onwards' : '')
                                 : 'Free'}
                             </span>
@@ -90,7 +117,7 @@ function ComparePageContent() {
 
 export default function ComparePage() {
     return (
-        <Suspense fallback={<div>Loading comparison...</div>}>
+        <Suspense fallback={<div>Loading...</div>}>
             <ComparePageContent />
         </Suspense>
     )

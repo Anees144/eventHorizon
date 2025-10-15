@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { getRecommendedEventsAction } from './actions';
+import { getRecommendedEventsAction from './actions';
 import { EventCard } from '@/components/events/event-card';
 import type { Event } from '@/lib/types';
+import { getEvents } from '@/lib/events';
 
 export default function RecommendationsPage() {
   const [loading, setLoading] = useState(false);
@@ -18,15 +19,24 @@ export default function RecommendationsPage() {
   const handleGetRecommendations = async () => {
     setLoading(true);
     setRecommendations(null);
-    const result = await getRecommendedEventsAction();
-    if (result.error) {
-      toast({
+    try {
+      const allEvents = await getEvents();
+      const result = await getRecommendedEventsAction(allEvents);
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error,
+        });
+      } else {
+        setRecommendations(result.recommendedEvents);
+      }
+    } catch(e) {
+       toast({
         variant: 'destructive',
         title: 'Error',
-        description: result.error,
+        description: 'Could not fetch events for recommendations.',
       });
-    } else {
-      setRecommendations(result.recommendedEvents);
     }
     setLoading(false);
   };
@@ -66,7 +76,7 @@ export default function RecommendationsPage() {
                 <h2 className="mb-6 text-center font-headline text-2xl font-semibold">Here are some events you might like:</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {recommendations.map((event) => (
-                        <EventCard key={event.id} event={event} />
+                        <EventCard key={event.id} event={event} onCompareChange={() => {}} isComparing={false} />
                     ))}
                 </div>
             </div>

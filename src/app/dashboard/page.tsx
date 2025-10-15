@@ -1,25 +1,14 @@
-
-
 'use client';
 import Link from "next/link"
 import {
   ArrowUpRight,
   CalendarClock,
-  CircleUser,
   CreditCard,
   DollarSign,
-  Menu,
-  Package2,
-  Search,
   Users,
 } from "lucide-react"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -37,11 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { events, user } from "@/lib/data"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Event } from "@/lib/types";
+import { getEventsByOrganizer } from "@/lib/events";
+import { useUser } from "@/firebase";
 
 type EventWithFormattedDate = Event & {
     formattedDate: string;
@@ -60,34 +50,46 @@ const revenueData = [
 
 function DashboardPageContent() {
     const searchParams = useSearchParams();
+    const { user, isUserLoading } = useUser();
     const [userEvents, setUserEvents] = useState<EventWithFormattedDate[]>([]);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') ?? '');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setSearchTerm(searchParams.get('search') ?? '');
     }, [searchParams]);
 
     useEffect(() => {
-        const searchLower = searchTerm.toLowerCase();
-        const processedEvents = events
-            .filter(e => e.organizerId === user.id)
-            .filter(e => {
-                if (!searchTerm) return true;
-                return e.title.toLowerCase().includes(searchLower) ||
-                       e.description.toLowerCase().includes(searchLower) ||
-                       e.organizer.toLowerCase().includes(searchLower);
-            })
-            .map(event => {
-                const eventDate = parseISO(event.date);
-                return {
-                    ...event,
-                    formattedDate: format(eventDate, 'MMM d, yyyy'),
-                    isUpcoming: eventDate > new Date(),
-                    formattedDistance: formatDistanceToNow(eventDate, { addSuffix: true }),
-                };
-            });
-        setUserEvents(processedEvents);
-    }, [searchTerm]);
+        async function fetchUserEvents() {
+            if (user) {
+                setLoading(true);
+                const eventsFromDb = await getEventsByOrganizer(user.uid);
+                
+                const searchLower = searchTerm.toLowerCase();
+                const processedEvents = eventsFromDb
+                    .filter(e => {
+                        if (!searchTerm) return true;
+                        return e.title.toLowerCase().includes(searchLower) ||
+                               e.description.toLowerCase().includes(searchLower) ||
+                               e.organizer.toLowerCase().includes(searchLower);
+                    })
+                    .map(event => {
+                        const eventDate = parseISO(event.date as string);
+                        return {
+                            ...event,
+                            formattedDate: format(eventDate, 'MMM d, yyyy'),
+                            isUpcoming: eventDate > new Date(),
+                            formattedDistance: formatDistanceToNow(eventDate, { addSuffix: true }),
+                        };
+                    });
+                setUserEvents(processedEvents);
+                setLoading(false);
+            } else if (!isUserLoading) {
+                setLoading(false);
+            }
+        }
+        fetchUserEvents();
+    }, [searchTerm, user, isUserLoading]);
 
     const { totalRevenue, ticketsSold, activeEventsCount } = useMemo(() => {
         let revenue = 0;
@@ -95,8 +97,6 @@ function DashboardPageContent() {
         let active = 0;
         
         userEvents.forEach(event => {
-            // A mock calculation for revenue and tickets.
-            // In a real app, this would come from a database.
             const eventRevenue = event.ticketTiers.reduce((acc, tier) => acc + tier.price * 50, 0); // Assume 50 tickets sold per tier
             const eventTickets = event.ticketTiers.length * 50;
             revenue += eventRevenue;
@@ -111,6 +111,10 @@ function DashboardPageContent() {
             activeEventsCount: active
         };
     }, [userEvents]);
+
+    if (loading) {
+        return <div>Loading dashboard...</div>
+    }
 
 
   return (

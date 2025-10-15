@@ -1,16 +1,14 @@
-
-
 'use client';
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck, Eye, Star, UserPlus } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
-import { events } from '@/lib/data';
+import { getEventById } from '@/lib/events';
 import { MainHeader } from '@/components/layout/main-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
-import type { TicketTier, UserProfile } from '@/lib/types';
+import type { TicketTier, UserProfile, Event } from '@/lib/types';
 import { CalendarButton } from '@/components/events/calendar-button';
 import { ShareButton } from '@/components/events/share-button';
 import { VideoEmbed } from '@/components/events/video-embed';
@@ -28,7 +26,8 @@ import { VideoEmbed } from '@/components/events/video-embed';
 export default function EventPage() {
   const params = useParams();
   const eventId = params.id as string;
-  const event = events.find((e) => e.id === eventId);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loadingEvent, setLoadingEvent] = useState(true);
   
   const [formattedDate, setFormattedDate] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
@@ -47,25 +46,34 @@ export default function EventPage() {
   const isSaved = userProfile?.savedEvents?.includes(event?.id || '') || false;
 
   useEffect(() => {
-    if (event) {
-      const eventDate = parseISO(event.date);
-      setFormattedDate(format(eventDate, 'EEEE, MMMM d, yyyy'));
-      if(event.ticketTiers.length > 0) {
-        setSelectedTier(event.ticketTiers[0]);
-      }
-      // Mock data for popularity, delayed to client-side
-      setPopularity({
-        views: Math.floor(Math.random() * 5000) + 1000,
-        saves: Math.floor(Math.random() * 500) + 50,
-        registrations: Math.floor(Math.random() * 800) + 100,
-      });
+    async function fetchEvent() {
+        setLoadingEvent(true);
+        const eventData = await getEventById(eventId);
+        if (eventData) {
+            setEvent(eventData);
+            const eventDate = parseISO(eventData.date as string);
+            setFormattedDate(format(eventDate, 'EEEE, MMMM d, yyyy'));
+            if(eventData.ticketTiers.length > 0) {
+                setSelectedTier(eventData.ticketTiers[0]);
+            }
+             // Mock data for popularity, delayed to client-side
+            setPopularity({
+                views: Math.floor(Math.random() * 5000) + 1000,
+                saves: Math.floor(Math.random() * 500) + 50,
+                registrations: Math.floor(Math.random() * 800) + 100,
+            });
+        }
+        setLoadingEvent(false);
     }
-  }, [event]);
+    fetchEvent();
+  }, [eventId]);
+
+  if (loadingEvent) {
+    return <div>Loading event...</div>
+  }
 
   if (!event) {
-    return (
-      <div>Event not found.</div>
-    )
+    notFound();
   }
   
   const handleSaveToggle = async () => {

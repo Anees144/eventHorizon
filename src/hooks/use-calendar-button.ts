@@ -1,9 +1,9 @@
-
 'use client';
 
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import type { Event } from '@/lib/types';
+import { parseISO } from 'date-fns';
 
 function formatToICSDate(date: Date) {
   return format(date, "yyyyMMdd'T'HHmmss'Z'");
@@ -11,7 +11,7 @@ function formatToICSDate(date: Date) {
 
 export function useCalendarButton(event: Event) {
   const { googleCalendarUrl, getIcsContent } = useMemo(() => {
-    const startDate = new Date(event.date);
+    const startDate = parseISO(event.date as string);
     // Assume event is 2 hours long for end date
     const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); 
 

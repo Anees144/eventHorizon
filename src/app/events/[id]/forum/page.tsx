@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -6,7 +5,6 @@ import { notFound, useParams } from 'next/navigation';
 import { SendHorizonal, ArrowLeft, LogIn } from 'lucide-react';
 import { useCollection, useFirebase, useUser } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { events } from '@/lib/data';
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { getEventById } from '@/lib/events';
+import type { Event } from '@/lib/types';
 
 type ForumMessage = {
   id: string;
@@ -28,11 +28,25 @@ type ForumMessage = {
 export default function ForumPage() {
   const params = useParams();
   const eventId = params.id as string;
-  const event = events.find((e) => e.id === eventId);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loadingEvent, setLoadingEvent] = useState(true);
+
   const { firestore } = useFirebase();
   const { user, isUserLoading } = useUser();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchEvent() {
+      setLoadingEvent(true);
+      const eventData = await getEventById(eventId);
+      if (eventData) {
+        setEvent(eventData);
+      }
+      setLoadingEvent(false);
+    }
+    fetchEvent();
+  }, [eventId]);
 
   const messagesQuery = firestore ? query(
       collection(firestore, `events/${eventId}/forums/general/messages`),
@@ -59,6 +73,10 @@ export default function ForumPage() {
 
     setNewMessage('');
   };
+
+  if (loadingEvent) {
+    return <div>Loading event...</div>
+  }
 
   if (!event) {
     notFound();

@@ -16,7 +16,7 @@ export const user: User = {
     interests: ['Music', 'Technology', 'Art']
 };
 
-export const events: Event[] = [
+export const initialEvents: Event[] = [
     {
         id: '1',
         title: 'Synthwave Night',
