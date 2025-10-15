@@ -14,8 +14,8 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         throw new Error("User must be logged in to create an event.");
     }
     
-    // Create a new object for Firestore, only including defined values.
-    const dataToSave: any = {
+    // Start with a base object of required fields.
+    const dataToSave: { [key: string]: any } = {
         title: eventData.title,
         description: eventData.description,
         richDescription: eventData.richDescription,
@@ -33,11 +33,11 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         longitude: eventData.longitude,
     };
 
-    // Only add optional fields if they exist to avoid 'undefined' errors.
+    // Conditionally add optional fields only if they have a value.
     if (eventData.videoUrl) {
         dataToSave.videoUrl = eventData.videoUrl;
     }
-    if (eventData.tags) {
+    if (eventData.tags && eventData.tags.length > 0) {
         dataToSave.tags = eventData.tags;
     }
 
