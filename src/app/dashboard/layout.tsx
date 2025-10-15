@@ -12,6 +12,7 @@ import {
   Settings,
   Sparkles,
   Users,
+  Bookmark
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,7 @@ import { useCallback } from 'react';
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/dashboard/recommendations', icon: Sparkles, label: 'For You' },
+  { href: '/dashboard/saved-events', icon: Bookmark, label: 'Saved Events' },
   { href: '/dashboard/create', icon: CalendarCheck, label: 'Create Event' },
   { href: '/dashboard/profile', icon: Settings, label: 'Profile' },
 ];

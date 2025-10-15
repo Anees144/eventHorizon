@@ -1,3 +1,4 @@
+
 import type { DateRange } from "react-day-picker";
 
 export type User = {
@@ -7,6 +8,13 @@ export type User = {
   avatarUrl: string;
   avatarHint: string;
   interests: string[];
+};
+
+export type UserProfile = {
+  name: string;
+  email: string;
+  interests: string[];
+  savedEvents?: string[];
 };
 
 export type Event = {

@@ -3,8 +3,10 @@
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
-import { CalendarDays, MapPin, User, Tag, MessageSquare, Ticket } from 'lucide-react';
+import { CalendarDays, MapPin, User, Tag, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
 import { notFound, Link } from 'next/navigation';
+import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
 import { events } from '@/lib/data';
 import { MainHeader } from '@/components/layout/main-header';
@@ -16,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
-import type { TicketTier } from '@/lib/types';
+import type { TicketTier, UserProfile } from '@/lib/types';
 
 type EventPageProps = {
   params: {
@@ -28,6 +30,17 @@ export default function EventPage({ params }: EventPageProps) {
   const event = events.find((e) => e.id === params.id);
   const [formattedDate, setFormattedDate] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
+
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const userProfileRef = useMemoFirebase(
+    () => (firestore && user ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+  const { data: userProfile } = useDoc<UserProfile>(userProfileRef);
+
+  const isSaved = userProfile?.savedEvents?.includes(event?.id || '') || false;
 
   useEffect(() => {
     if (event) {
@@ -42,6 +55,21 @@ export default function EventPage({ params }: EventPageProps) {
   if (!event) {
     notFound();
   }
+  
+  const handleSaveToggle = async () => {
+    if (!user || !firestore || !event) return;
+
+    const userDocRef = doc(firestore, 'users', user.uid);
+    if (isSaved) {
+      await updateDoc(userDocRef, {
+        savedEvents: arrayRemove(event.id),
+      });
+    } else {
+      await updateDoc(userDocRef, {
+        savedEvents: arrayUnion(event.id),
+      });
+    }
+  };
 
   const handleTierChange = (tierId: string) => {
     const tier = event.ticketTiers.find(t => t.id === tierId);
@@ -77,10 +105,20 @@ export default function EventPage({ params }: EventPageProps) {
           />
           <div className="absolute inset-0 bg-black/40" />
           <div className="container relative flex h-full flex-col items-start justify-end px-4 py-12 text-primary-foreground md:px-6">
-            <Badge variant="secondary" className="mb-2 bg-secondary/80 text-secondary-foreground">{event.category}</Badge>
-            <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-              {event.title}
-            </h1>
+            <div className="flex w-full items-end justify-between">
+              <div>
+                <Badge variant="secondary" className="mb-2 bg-secondary/80 text-secondary-foreground">{event.category}</Badge>
+                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
+                  {event.title}
+                </h1>
+              </div>
+              {user && (
+                <Button variant="secondary" size="lg" onClick={handleSaveToggle}>
+                  {isSaved ? <BookmarkCheck className="mr-2 h-5 w-5"/> : <Bookmark className="mr-2 h-5 w-5" />}
+                  {isSaved ? 'Saved' : 'Save Event'}
+                </Button>
+              )}
+            </div>
           </div>
         </section>
 
