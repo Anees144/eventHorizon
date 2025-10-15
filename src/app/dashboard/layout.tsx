@@ -73,11 +73,21 @@ export default function DashboardLayout({
     // Only apply search on the dashboard page
     if (pathname === '/dashboard') {
       router.push(`${pathname}?${createQueryString('search', e.target.value)}`);
+    } else {
+      // If on other pages, navigate to homepage with search
+      router.push(`/?${createQueryString('search', e.target.value)}`);
     }
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const search = formData.get('search') as string;
+    if (pathname === '/dashboard') {
+      router.push(`${pathname}?${createQueryString('search', search)}`);
+    } else {
+      router.push(`/?${createQueryString('search', search)}`);
+    }
   };
 
   return (
@@ -147,11 +157,11 @@ export default function DashboardLayout({
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
+                  name="search"
                   placeholder="Search events..."
                   className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
                   onChange={handleSearch}
-                  defaultValue={pathname === '/dashboard' ? searchParams.get('search') ?? '' : ''}
-                  disabled={pathname !== '/dashboard'}
+                  defaultValue={searchParams.get('search') ?? ''}
                 />
               </div>
             </form>

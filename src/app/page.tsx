@@ -22,7 +22,7 @@ import { EventCarousel } from '@/components/events/event-carousel';
 
 function EventList() {
   const searchParams = useSearchParams();
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>(events);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
 
   const [filters, setFilters] = useState<FilterState>({
@@ -87,7 +87,8 @@ function EventList() {
         filters.search &&
         !event.title.toLowerCase().includes(searchLower) &&
         !event.description.toLowerCase().includes(searchLower) &&
-        !event.organizer.toLowerCase().includes(searchLower)
+        !event.organizer.toLowerCase().includes(searchLower) &&
+        !event.location.toLowerCase().includes(searchLower)
       ) {
         return false;
       }
