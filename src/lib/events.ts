@@ -23,7 +23,7 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         imageUrl: eventData.imageUrl,
         imageHint: eventData.imageHint,
         visibility: eventData.visibility,
-        date: eventData.date ? new Date(eventData.date) : serverTimestamp(),
+        date: eventData.date ? new Date(eventData.date) : new Date(),
         ticketTiers: eventData.ticketTiers,
         promoCodes: eventData.promoCodes,
         organizerId: eventData.organizerId,
