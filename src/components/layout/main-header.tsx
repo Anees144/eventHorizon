@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { Logo } from '@/components/icons';
@@ -6,11 +9,14 @@ import { Input } from '@/components/ui/input';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { ThemeToggle } from './theme-toggle';
+import { useUser } from '@/firebase';
+import { UserNav } from './user-nav';
 
 export function MainHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user, isUserLoading } = useUser();
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -56,6 +62,14 @@ export function MainHeader() {
             >
               Create Event
             </Link>
+             {user && (
+                <Link
+                href="/dashboard"
+                className="transition-colors hover:text-primary text-muted-foreground"
+                >
+                Dashboard
+                </Link>
+            )}
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
@@ -74,13 +88,19 @@ export function MainHeader() {
             </form>
           </div>
           <nav className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="ghost" asChild>
-                <Link href="/login">Log In</Link>
-            </Button>
-            <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link href="/signup">Sign Up</Link>
-            </Button>
+            {!isUserLoading && (
+                user ? <UserNav /> : (
+                    <>
+                        <ThemeToggle />
+                        <Button variant="ghost" asChild>
+                            <Link href="/login">Log In</Link>
+                        </Button>
+                        <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                            <Link href="/signup">Sign Up</Link>
+                        </Button>
+                    </>
+                )
+            )}
           </nav>
         </div>
       </div>

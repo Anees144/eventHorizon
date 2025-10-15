@@ -3,10 +3,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { notFound, useParams } from 'next/navigation';
-import { SendHorizonal, ArrowLeft } from 'lucide-react';
+import { SendHorizonal, ArrowLeft, LogIn } from 'lucide-react';
 import { useCollection, useFirebase, useUser } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
 import { events } from '@/lib/data';
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type ForumMessage = {
   id: string;
@@ -29,7 +29,7 @@ export default function ForumPage() {
   const params = useParams();
   const eventId = params.id as string;
   const event = events.find((e) => e.id === eventId);
-  const { firestore, auth } = useFirebase();
+  const { firestore } = useFirebase();
   const { user, isUserLoading } = useUser();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,12 +42,6 @@ export default function ForumPage() {
   const { data: messages, isLoading: messagesLoading } = useCollection<ForumMessage>(messagesQuery);
   
   useEffect(() => {
-    if (!isUserLoading && !user) {
-      initiateAnonymousSignIn(auth);
-    }
-  }, [isUserLoading, user, auth]);
-
-  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -59,7 +53,7 @@ export default function ForumPage() {
       senderId: user.uid,
       content: newMessage,
       timestamp: serverTimestamp(),
-      senderName: user.isAnonymous ? 'Anonymous User' : user.displayName || 'User',
+      senderName: user.displayName || user.email || 'Anonymous User',
       senderAvatar: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`
     });
 
@@ -135,7 +129,7 @@ export default function ForumPage() {
                    {msg.senderId === user?.uid && (
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={msg.senderAvatar} />
-                      <AvatarFallback>{msg.senderName?.charAt(0) || 'U'}</AvatarFallback>
+                      <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                   )}
                 </div>
@@ -143,17 +137,27 @@ export default function ForumPage() {
               <div ref={messagesEndRef} />
             </CardContent>
             <CardFooter>
-              <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  disabled={isUserLoading}
-                />
-                <Button type="submit" size="icon" disabled={!newMessage.trim() || isUserLoading}>
-                  <SendHorizonal className="h-4 w-4" />
-                </Button>
-              </form>
+              {!isUserLoading && user ? (
+                  <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
+                    <Input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      disabled={isUserLoading}
+                    />
+                    <Button type="submit" size="icon" disabled={!newMessage.trim() || isUserLoading}>
+                      <SendHorizonal className="h-4 w-4" />
+                    </Button>
+                  </form>
+              ) : (
+                <Alert>
+                    <LogIn className="h-4 w-4"/>
+                    <AlertTitle>Join the conversation!</AlertTitle>
+                    <AlertDescription>
+                        <Link href="/login" className="font-bold underline">Log in</Link> or <Link href="/signup" className="font-bold underline">sign up</Link> to post in the forum.
+                    </AlertDescription>
+                </Alert>
+              )}
             </CardFooter>
           </Card>
         </div>
