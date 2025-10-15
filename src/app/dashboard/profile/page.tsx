@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -12,9 +15,21 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { user, categories } from "@/lib/data"
+import { categories } from "@/lib/data"
+import { useUser } from "@/firebase";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
+  const { user } = useUser();
+
+  if (!user) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <p>Loading profile...</p>
+        </div>
+    )
+  }
+
   return (
     <div className="grid gap-6">
         <div className="grid md:grid-cols-3 gap-6">
@@ -23,17 +38,27 @@ export default function ProfilePage() {
                     <CardHeader>
                         <CardTitle>Profile</CardTitle>
                         <CardDescription>
-                        Update your personal information and interests.
+                        Update your personal information and profile picture.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6">
+                        <div className="flex flex-col items-center gap-4">
+                            <Avatar className="h-24 w-24">
+                                <AvatarImage src={user.photoURL || ''} alt={user.displayName || ''} />
+                                <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex gap-2">
+                                <Button size="sm">Change</Button>
+                                <Button size="sm" variant="outline">Remove</Button>
+                            </div>
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
-                            <Input id="name" defaultValue={user.name} />
+                            <Input id="name" defaultValue={user.displayName || ''} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue={user.email} />
+                            <Input id="email" type="email" defaultValue={user.email || ''} readOnly />
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -73,7 +98,7 @@ export default function ProfilePage() {
                     <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {categories.map((category) => (
                             <div key={category} className="flex items-center space-x-2">
-                                <Checkbox id={category.toLowerCase()} defaultChecked={user.interests.includes(category)} />
+                                <Checkbox id={category.toLowerCase()} defaultChecked={false} />
                                 <label
                                     htmlFor={category.toLowerCase()}
                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
