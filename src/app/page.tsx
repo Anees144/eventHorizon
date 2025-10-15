@@ -4,6 +4,8 @@
 import { Suspense, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { ArrowRight, Sparkles, MapPin, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 import { events } from '@/lib/data';
 import { EventCard } from '@/components/events/event-card';
@@ -11,6 +13,9 @@ import EventFilters from '@/components/events/event-filters';
 import { MainHeader } from '@/components/layout/main-header';
 import type { FilterState, Event } from '@/lib/types';
 import { getDistance } from '@/lib/utils';
+import { getRecommendedEventsAction } from './dashboard/recommendations/actions';
+import { Button } from '@/components/ui/button';
+import { EventCarousel } from '@/components/events/event-carousel';
 
 
 function EventList() {
@@ -104,7 +109,7 @@ function EventList() {
 
 
   return (
-    <div className="container grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
+    <div className="grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event) => (
           <EventCard key={event.id} event={event} />
@@ -120,66 +125,152 @@ function EventList() {
 }
 
 function HomePageContent() {
-  const [filters, setFilters] = useState<FilterState>({
-    category: 'all',
-    location: '',
-    date: null,
-    search: '',
-    radius: 50,
-  });
+    const [filters, setFilters] = useState<FilterState>({
+        category: 'all',
+        location: '',
+        date: null,
+        search: '',
+        radius: 50,
+    });
+    const [recommendedEvents, setRecommendedEvents] = useState<Event[] | null>(null);
+    const [nearbyEvents, setNearbyEvents] = useState<Event[]>([]);
+    const [trendingEvents] = useState<Event[]>(() => events.slice(0, 5));
+    const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
 
-  return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
-      <MainHeader />
-      <main className="flex-1">
-        <section className="relative h-[400px] w-full">
-          <Image
-            src="https://picsum.photos/seed/hero/1600/400"
-            alt="Hero background"
-            fill
-            className="object-cover"
-            data-ai-hint="vibrant event"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <div className="container px-4 md:px-6">
-              <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Discover Your Next Experience
-              </h1>
-              <p className="mx-auto mt-4 max-w-[700px] text-foreground/80 md:text-xl">
-                Explore thousands of events from concerts to conferences. Your
-                next adventure awaits.
-              </p>
-            </div>
-          </div>
-        </section>
+    useEffect(() => {
+        getRecommendedEventsAction().then(result => {
+            if (result.recommendedEvents) {
+                setRecommendedEvents(result.recommendedEvents);
+            }
+        });
 
-        <div className="container -mt-16 px-4 md:px-6">
-          <EventFilters onFilterChange={setFilters} />
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setUserLocation({
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude,
+                    });
+                },
+                () => {
+                    setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+                }
+            );
+        } else {
+            setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
+        }
+    }, []);
+
+    useEffect(() => {
+        if (userLocation) {
+            const nearby = events.filter(event => {
+                if (event.latitude && event.longitude) {
+                    const distance = getDistance(userLocation.lat, userLocation.lon, event.latitude, event.longitude);
+                    return distance < 50; // 50km radius for nearby
+                }
+                return false;
+            });
+            setNearbyEvents(nearby);
+        }
+    }, [userLocation]);
+
+
+    return (
+        <div className="flex min-h-screen w-full flex-col bg-background">
+            <MainHeader />
+            <main className="flex-1">
+                <section className="relative h-[400px] w-full">
+                    <Image
+                        src="https://picsum.photos/seed/hero/1600/400"
+                        alt="Hero background"
+                        fill
+                        className="object-cover"
+                        data-ai-hint="vibrant event"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <div className="container px-4 md:px-6">
+                            <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+                                Discover Your Next Experience
+                            </h1>
+                            <p className="mx-auto mt-4 max-w-[700px] text-foreground/80 md:text-xl">
+                                Explore thousands of events from concerts to conferences. Your
+                                next adventure awaits.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <div className="container -mt-16 px-4 md:px-6">
+                    <EventFilters onFilterChange={setFilters} />
+                </div>
+                
+                <section className="py-12 md:py-24 lg:py-32 space-y-16">
+                    {/* Trending Events Section */}
+                    <div>
+                        <div className="container mb-8 flex items-center justify-between">
+                            <h2 className="font-headline text-3xl font-bold flex items-center gap-2"><TrendingUp /> Trending Events</h2>
+                            <Button variant="ghost" asChild>
+                                <Link href="/?search=">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                            </Button>
+                        </div>
+                        <EventCarousel events={trendingEvents} />
+                    </div>
+
+                    {/* Nearby Events Section */}
+                    {nearbyEvents.length > 0 && (
+                        <div>
+                            <div className="container mb-8 flex items-center justify-between">
+                                <h2 className="font-headline text-3xl font-bold flex items-center gap-2"><MapPin/> Nearby You</h2>
+                                <Button variant="ghost" asChild>
+                                <Link href="/?radius=25">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                                </Button>
+                            </div>
+                            <EventCarousel events={nearbyEvents} />
+                        </div>
+                    )}
+
+                    {/* Recommended Events Section */}
+                    {recommendedEvents && recommendedEvents.length > 0 && (
+                        <div>
+                            <div className="container mb-8 flex items-center justify-between">
+                                 <h2 className="font-headline text-3xl font-bold flex items-center gap-2"><Sparkles/> For You</h2>
+                                 <Button variant="ghost" asChild>
+                                    <Link href="/dashboard/recommendations">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                                </Button>
+                            </div>
+                           <EventCarousel events={recommendedEvents} />
+                        </div>
+                    )}
+
+                </section>
+                
+                 <section className="py-12 md:py-24 lg:py-32 border-t">
+                    <div className="container mb-8">
+                        <h2 className="font-headline text-3xl font-bold">All Events</h2>
+                    </div>
+                    <EventList />
+                </section>
+
+            </main>
+            <footer className="border-t bg-card">
+                <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
+                    <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+                        <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
+                            Built by Event Horizon. &copy; {new Date().getFullYear()} All
+                            rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </div>
-
-        <section className="py-12 md:py-24 lg:py-32">
-          <EventList />
-        </section>
-      </main>
-      <footer className="border-t bg-card">
-        <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
-          <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-            <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-              Built by Event Horizon. &copy; {new Date().getFullYear()} All
-              rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+    );
 }
 
 export default function Home() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomePageContent />
-    </Suspense>
-  )
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <HomePageContent />
+        </Suspense>
+    )
 }
