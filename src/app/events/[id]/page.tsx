@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
-import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck } from 'lucide-react';
+import { CalendarDays, MapPin, User, MessageSquare, Ticket, Bookmark, BookmarkCheck, Eye, Star, UserPlus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
@@ -30,6 +30,8 @@ export default function EventPage() {
   
   const [formattedDate, setFormattedDate] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
+  const [popularity, setPopularity] = useState({ views: 0, saves: 0, registrations: 0 });
+
 
   const { user } = useUser();
   const firestore = useFirestore();
@@ -49,6 +51,12 @@ export default function EventPage() {
       if(event.ticketTiers.length > 0) {
         setSelectedTier(event.ticketTiers[0]);
       }
+      // Mock data for popularity, delayed to client-side
+      setPopularity({
+        views: Math.floor(Math.random() * 5000) + 1000,
+        saves: Math.floor(Math.random() * 500) + 50,
+        registrations: Math.floor(Math.random() * 800) + 100,
+      });
     }
   }, [event]);
 
@@ -159,12 +167,35 @@ export default function EventPage() {
                   <span>{event.organizer}</span>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Popularity</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-3 gap-2 text-center">
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md bg-muted p-2">
+                        <Eye className="h-5 w-5 text-muted-foreground" />
+                        <span className="font-bold text-lg">{popularity.views.toLocaleString()}</span>
+                        <span className="text-xs text-muted-foreground">Views</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md bg-muted p-2">
+                        <Star className="h-5 w-5 text-muted-foreground" />
+                        <span className="font-bold text-lg">{popularity.saves.toLocaleString()}</span>
+                        <span className="text-xs text-muted-foreground">Saves</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md bg-muted p-2">
+                        <UserPlus className="h-5 w-5 text-muted-foreground" />
+                        <span className="font-bold text-lg">{popularity.registrations.toLocaleString()}</span>
+                        <span className="text-xs text-muted-foreground">Registrations</span>
+                    </div>
+                </CardContent>
+              </Card>
               
               <Card>
                 <CardHeader>
                   <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 gap-2">
+                <CardContent className="flex flex-col gap-2">
                    <CalendarButton event={event} />
                    <ShareButton event={event} />
                 </CardContent>
