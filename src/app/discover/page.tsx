@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import type { Event, FilterState } from '@/lib/types';
 import { getEvents } from '@/lib/events';
 import { EventCarousel } from '@/components/events/event-carousel';
@@ -11,19 +12,30 @@ import { getDistance } from '@/lib/utils';
 import { EventCard } from '@/components/events/event-card';
 import { MainHeader } from '@/components/layout/main-header';
 import { CompareButton } from '@/components/events/compare-button';
+import type { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
 
 export default function DiscoverPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<FilterState>({
-    category: 'all',
-    location: '',
-    date: undefined,
-    search: '',
-    radius: 50,
-    price: [0, 500],
+
+  const [filters, setFilters] = useState<FilterState>(() => {
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    return {
+      category: searchParams.get('category') ?? 'all',
+      location: searchParams.get('location') ?? '',
+      date: from ? { from: new Date(from), to: to ? new Date(to) : undefined } : undefined,
+      search: searchParams.get('search') ?? '',
+      radius: Number(searchParams.get('radius')) || 50,
+      price: [0, 500],
+    };
   });
+  
   const [compareList, setCompareList] = useState<string[]>([]);
 
   useEffect(() => {
@@ -32,7 +44,6 @@ export default function DiscoverPage() {
       try {
         const events = await getEvents();
         setAllEvents(events);
-        setFilteredEvents(events); // Initially, show all events
       } catch (error) {
         console.error("Failed to fetch events:", error);
       } finally {
@@ -42,16 +53,66 @@ export default function DiscoverPage() {
     fetchEvents();
   }, []);
 
+  const updateQueryString = useCallback((name: string, value: string | number | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value !== null && value !== 'all' && value.toString().length > 0) {
+      params.set(name, String(value));
+    } else {
+      params.delete(name);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+
+  const updateDateQueryParams = useCallback((dateRange: DateRange | undefined) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (dateRange?.from) {
+      params.set('from', format(dateRange.from, 'yyyy-MM-dd'));
+    } else {
+      params.delete('from');
+    }
+    if (dateRange?.to) {
+      params.set('to', format(dateRange.to, 'yyyy-MM-dd'));
+    } else {
+      params.delete('to');
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+
+
+  const handleFilterChange = useCallback((newFilters: Partial<FilterState>) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+
+    if (newFilters.category !== undefined) updateQueryString('category', newFilters.category);
+    if (newFilters.location !== undefined) updateQueryString('location', newFilters.location);
+    if (newFilters.radius !== undefined) updateQueryString('radius', newFilters.radius);
+    if (newFilters.search !== undefined) updateQueryString('search', newFilters.search);
+    if (newFilters.date !== undefined) updateDateQueryParams(newFilters.date);
+
+  }, [filters, updateQueryString, updateDateQueryParams]);
+
+  const handleClearFilters = useCallback(() => {
+    const defaultFilters = {
+        category: 'all',
+        location: '',
+        date: undefined,
+        search: '',
+        radius: 50,
+        price: [0, 500],
+    };
+    setFilters(defaultFilters);
+    router.push('/discover', { scroll: false });
+  }, [router]);
+
+
   useEffect(() => {
     let newFilteredEvents = allEvents;
 
-    // Category
     if (filters.category !== 'all') {
       newFilteredEvents = newFilteredEvents.filter(
         (e) => e.category.toLowerCase() === filters.category.toLowerCase()
       );
     }
-    // Search
     if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         newFilteredEvents = newFilteredEvents.filter(e => 
@@ -61,7 +122,6 @@ export default function DiscoverPage() {
             e.category.toLowerCase().includes(searchLower)
         );
     }
-    // Date
     if (filters.date?.from) {
         newFilteredEvents = newFilteredEvents.filter(e => {
             const eventDate = new Date(e.date as string);
@@ -76,10 +136,6 @@ export default function DiscoverPage() {
   }, [filters, allEvents]);
 
 
-  const handleFilterChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
-  
   const handleCompareChange = (eventId: string, isSelected: boolean) => {
     setCompareList(prev => 
         isSelected ? [...prev, eventId] : prev.filter(id => id !== eventId)
@@ -112,7 +168,11 @@ export default function DiscoverPage() {
         </section>
         
         <section className="container -mt-8">
-            <EventFilters onFilterChange={handleFilterChange} />
+            <EventFilters 
+              filters={filters}
+              onFilterChange={handleFilterChange} 
+              onClearFilters={handleClearFilters}
+            />
         </section>
 
         {loading ? (
@@ -139,4 +199,3 @@ export default function DiscoverPage() {
     </div>
   );
 }
-
