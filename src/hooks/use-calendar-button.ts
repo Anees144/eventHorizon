@@ -10,7 +10,7 @@ function formatToICSDate(date: Date) {
 }
 
 export function useCalendarButton(event: Event) {
-  const { googleCalendarUrl, icsContent } = useMemo(() => {
+  const { googleCalendarUrl, getIcsContent } = useMemo(() => {
     const startDate = new Date(event.date);
     // Assume event is 2 hours long for end date
     const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); 
@@ -25,11 +25,11 @@ export function useCalendarButton(event: Event) {
     googleUrl.searchParams.append('details', event.description);
     googleUrl.searchParams.append('location', event.location);
 
-    const icsContent = [
+    const getIcsContent = (url: string) => [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'BEGIN:VEVENT',
-      `URL:${window.location.href}`,
+      `URL:${url}`,
       `DTSTART:${formatToICSDate(startDate)}`,
       `DTEND:${formatToICSDate(endDate)}`,
       `SUMMARY:${event.title}`,
@@ -41,11 +41,13 @@ export function useCalendarButton(event: Event) {
 
     return {
       googleCalendarUrl: googleUrl.toString(),
-      icsContent,
+      getIcsContent,
     };
   }, [event]);
 
   const downloadIcsFile = () => {
+    // window.location.href is now accessed only on the client
+    const icsContent = getIcsContent(window.location.href);
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
