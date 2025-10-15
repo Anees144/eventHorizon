@@ -1,3 +1,4 @@
+
 'use client';
 import Link from "next/link"
 import {
@@ -63,28 +64,35 @@ function DashboardPageContent() {
         async function fetchUserEvents() {
             if (user) {
                 setLoading(true);
-                const eventsFromDb = await getEventsByOrganizer(user.uid);
-                
-                const searchLower = searchTerm.toLowerCase();
-                const processedEvents = eventsFromDb
-                    .filter(e => {
-                        if (!searchTerm) return true;
-                        return e.title.toLowerCase().includes(searchLower) ||
-                               e.description.toLowerCase().includes(searchLower) ||
-                               e.organizer.toLowerCase().includes(searchLower);
-                    })
-                    .map(event => {
-                        const eventDate = parseISO(event.date as string);
-                        return {
-                            ...event,
-                            formattedDate: format(eventDate, 'MMM d, yyyy'),
-                            isUpcoming: eventDate > new Date(),
-                            formattedDistance: formatDistanceToNow(eventDate, { addSuffix: true }),
-                        };
-                    });
-                setUserEvents(processedEvents);
-                setLoading(false);
+                try {
+                    const eventsFromDb = await getEventsByOrganizer(user.uid);
+                    
+                    const searchLower = searchTerm.toLowerCase();
+                    const processedEvents = eventsFromDb
+                        .filter(e => {
+                            if (!searchTerm) return true;
+                            return e.title.toLowerCase().includes(searchLower) ||
+                                   e.description.toLowerCase().includes(searchLower) ||
+                                   e.organizer.toLowerCase().includes(searchLower);
+                        })
+                        .map(event => {
+                            const eventDate = parseISO(event.date as string);
+                            return {
+                                ...event,
+                                formattedDate: format(eventDate, 'MMM d, yyyy'),
+                                isUpcoming: eventDate > new Date(),
+                                formattedDistance: formatDistanceToNow(eventDate, { addSuffix: true }),
+                            };
+                        });
+                    setUserEvents(processedEvents);
+                } catch (error) {
+                    console.error("Failed to fetch user events:", error);
+                    setUserEvents([]);
+                } finally {
+                    setLoading(false);
+                }
             } else if (!isUserLoading) {
+                setUserEvents([]);
                 setLoading(false);
             }
         }
