@@ -187,10 +187,10 @@ export default function CreateEventPage() {
                     />
                 </div>
                  <div className="grid gap-3">
-                    <Label htmlFor="description-rich">Description (Rich Text)</Label>
+                    <Label htmlFor="rich-description">Description (Rich Text)</Label>
                     <Textarea
-                    id="description-rich"
-                    placeholder="Use rich text to describe your event in detail."
+                    id="rich-description"
+                    placeholder="Use rich text to describe your event in detail. You can use HTML tags like <p>, <strong>, <ul> etc."
                     value={richDescription}
                     onChange={(e) => setRichDescription(e.target.value)}
                     className="min-h-32"
