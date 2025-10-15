@@ -69,8 +69,18 @@ export async function getEventById(id: string): Promise<Event | null> {
         const eventData = {
             ...data,
             id: docSnap.id,
-            date: data.date.toDate().toISOString(), // Convert Firestore Timestamp to ISO string
         } as Event;
+        
+        // Ensure date is an ISO string
+        const dateValue = data.date;
+        if (dateValue && typeof dateValue.toDate === 'function') {
+            eventData.date = dateValue.toDate().toISOString();
+        } else if (dateValue instanceof Date) {
+            eventData.date = dateValue.toISOString();
+        } else {
+            eventData.date = dateValue;
+        }
+
         return eventData;
     } else {
         return null;
