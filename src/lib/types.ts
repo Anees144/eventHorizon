@@ -27,3 +27,9 @@ export type TicketTier = {
   name: string;
   price: number;
 };
+
+export type FilterState = {
+    category: string;
+    location: string;
+    date: Date | null;
+}
