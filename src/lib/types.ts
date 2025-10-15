@@ -32,4 +32,5 @@ export type FilterState = {
     category: string;
     location: string;
     date: Date | null;
+    search: string;
 }

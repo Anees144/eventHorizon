@@ -1,41 +1,85 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 import { events } from '@/lib/data';
 import { EventCard } from '@/components/events/event-card';
 import EventFilters from '@/components/events/event-filters';
 import { MainHeader } from '@/components/layout/main-header';
-import type { FilterState } from '@/lib/types';
+import type { FilterState, Event } from '@/lib/types';
 
-export default function Home() {
+function EventList() {
+  const searchParams = useSearchParams();
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>(events);
+
+  const [filters, setFilters] = useState<FilterState>({
+    category: searchParams.get('category') ?? 'all',
+    location: searchParams.get('location') ?? '',
+    date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
+    search: searchParams.get('search') ?? '',
+  });
+
+  useEffect(() => {
+    setFilters({
+      category: searchParams.get('category') ?? 'all',
+      location: searchParams.get('location') ?? '',
+      date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
+      search: searchParams.get('search') ?? '',
+    });
+  }, [searchParams]);
+
+  useEffect(() => {
+    const newFilteredEvents = events.filter((event) => {
+      const searchLower = filters.search.toLowerCase();
+      if (
+        filters.search &&
+        !event.title.toLowerCase().includes(searchLower) &&
+        !event.description.toLowerCase().includes(searchLower)
+      ) {
+        return false;
+      }
+      if (filters.category !== 'all' && event.category.toLowerCase() !== filters.category) {
+        return false;
+      }
+      if (
+        filters.location &&
+        !event.location.toLowerCase().includes(filters.location.toLowerCase())
+      ) {
+        return false;
+      }
+      if (filters.date) {
+          const eventDate = new Date(event.date);
+          const filterDate = filters.date;
+          if (eventDate.getFullYear() !== filterDate.getFullYear() ||
+              eventDate.getMonth() !== filterDate.getMonth() ||
+              eventDate.getDate() !== filterDate.getDate()) {
+              return false;
+          }
+      }
+      return true;
+    });
+    setFilteredEvents(newFilteredEvents);
+  }, [filters]);
+
+
+  return (
+    <div className="container grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
+      {filteredEvents.map((event) => (
+        <EventCard key={event.id} event={event} />
+      ))}
+    </div>
+  );
+}
+
+function HomePageContent() {
+  // This state is now managed inside EventList based on searchParams
   const [filters, setFilters] = useState<FilterState>({
     category: 'all',
     location: '',
     date: null,
-  });
-
-  const filteredEvents = events.filter((event) => {
-    if (filters.category !== 'all' && event.category.toLowerCase() !== filters.category) {
-      return false;
-    }
-    if (
-      filters.location &&
-      !event.location.toLowerCase().includes(filters.location.toLowerCase())
-    ) {
-      return false;
-    }
-    if (filters.date) {
-        const eventDate = new Date(event.date);
-        const filterDate = filters.date;
-        if (eventDate.getFullYear() !== filterDate.getFullYear() ||
-            eventDate.getMonth() !== filterDate.getMonth() ||
-            eventDate.getDate() !== filterDate.getDate()) {
-            return false;
-        }
-    }
-    return true;
+    search: '',
   });
 
   return (
@@ -69,11 +113,7 @@ export default function Home() {
         </div>
 
         <section className="py-12 md:py-24 lg:py-32">
-          <div className="container grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
-            {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          <EventList />
         </section>
       </main>
       <footer className="border-t bg-card">
@@ -88,4 +128,12 @@ export default function Home() {
       </footer>
     </div>
   );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
+  )
 }

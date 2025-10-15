@@ -37,7 +37,8 @@ import {
 } from "@/components/ui/table"
 import { events, user } from "@/lib/data"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 type EventWithFormattedDate = typeof events[0] & {
     formattedDate: string;
@@ -45,12 +46,24 @@ type EventWithFormattedDate = typeof events[0] & {
     isUpcoming: boolean;
 };
 
-export default function DashboardPage() {
+function DashboardPageContent() {
+    const searchParams = useSearchParams();
     const [userEvents, setUserEvents] = useState<EventWithFormattedDate[]>([]);
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') ?? '');
 
     useEffect(() => {
+        setSearchTerm(searchParams.get('search') ?? '');
+    }, [searchParams]);
+
+    useEffect(() => {
+        const searchLower = searchTerm.toLowerCase();
         const processedEvents = events
             .filter(e => e.organizerId === user.id)
+            .filter(e => {
+                if (!searchTerm) return true;
+                return e.title.toLowerCase().includes(searchLower) ||
+                       e.description.toLowerCase().includes(searchLower);
+            })
             .map(event => {
                 const eventDate = parseISO(event.date);
                 return {
@@ -61,7 +74,7 @@ export default function DashboardPage() {
                 };
             });
         setUserEvents(processedEvents);
-    }, []);
+    }, [searchTerm]);
 
 
   return (
@@ -166,5 +179,13 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
     </>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardPageContent />
+    </Suspense>
   )
 }
