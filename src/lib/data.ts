@@ -475,6 +475,83 @@ export const events: Event[] = [
             { id: 't23-2', name: 'Full Festival Pass', price: 150, type: 'paid' }
         ],
         promoCodes: []
+    },
+    {
+        id: '24',
+        title: 'Hack for Good',
+        description: 'A 24-hour hackathon to build solutions for social good.',
+        richDescription: '<p>Join <strong>Hack for Good</strong>, a 24-hour coding marathon where developers, designers, and innovators come together to build technology solutions for non-profits and social enterprises. Food, drinks, and mentorship provided.</p>',
+        imageUrl: getImage('tech conference').imageUrl,
+        imageHint: 'tech conference',
+        category: 'Technology',
+        date: '2024-11-15T18:00:00.000Z',
+        location: 'TechHub, Berlin',
+        latitude: 52.5200,
+        longitude: 13.4050,
+        organizer: 'Code for a Cause',
+        organizerId: 'user-2',
+        ticketTiers: [
+            { id: 't24-1', name: 'Participant (Free)', price: 0, type: 'reservation' }
+        ],
+        promoCodes: []
+    },
+    {
+        id: '25',
+        title: 'Classical Masters',
+        description: 'An evening of breathtaking classical music from Beethoven and Mozart.',
+        richDescription: '<p>The City Symphony Orchestra presents <strong>Classical Masters</strong>, an unforgettable evening featuring Beethoven\'s Symphony No. 5 and Mozart\'s Requiem. A powerful performance that will move both new and seasoned classical music lovers.</p>',
+        imageUrl: getImage('music concert').imageUrl,
+        imageHint: 'music concert',
+        category: 'Music',
+        date: '2024-12-05T19:30:00.000Z',
+        location: 'Symphony Hall, Vienna',
+        latitude: 48.2082,
+        longitude: 16.3738,
+        organizer: 'City Symphony Orchestra',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't25-1', name: 'Standard Seat', price: 60, type: 'paid' },
+            { id: 't25-2', name: 'Premium Seat', price: 120, type: 'paid' }
+        ],
+        promoCodes: []
+    },
+    {
+        id: '26',
+        title: 'Silent Meditation Retreat',
+        description: 'A 3-day silent retreat to deepen your meditation practice.',
+        richDescription: '<p>Embark on a journey of inner peace at our <strong>Silent Meditation Retreat</strong>. This 3-day retreat provides a supportive environment for you to deepen your practice through guided sessions, walking meditation, and periods of silence. All meals are vegetarian.</p>',
+        imageUrl: getImage('yoga workshop').imageUrl,
+        imageHint: 'yoga workshop',
+        category: 'Wellness',
+        date: '2024-10-18T15:00:00.000Z',
+        location: 'Mountain Monastery, Kyoto',
+        latitude: 35.0116,
+        longitude: 135.7681,
+        organizer: 'Mindful Path',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't26-1', name: 'Retreat Package', price: 400, type: 'paid' }
+        ],
+        promoCodes: []
+    },
+    {
+        id: '27',
+        title: 'Artisan Cheese & Wine Pairing',
+        description: 'An evening of exquisite cheese and wine pairings.',
+        richDescription: '<p>Join us for an <strong>Artisan Cheese & Wine Pairing</strong> night. A sommelier and a fromager will guide you through a selection of six unique cheeses, each paired with a carefully selected wine to enhance its flavor. A delight for the senses.</p>',
+        imageUrl: getImage('food festival').imageUrl,
+        imageHint: 'food festival',
+        category: 'Food',
+        date: '2024-11-22T19:00:00.000Z',
+        location: 'The Vintner\'s Room, Napa Valley',
+        latitude: 38.5025,
+        longitude: -122.2654,
+        organizer: 'Napa Culinary Experiences',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't27-1', name: 'Tasting Experience', price: 95, type: 'paid' }
+        ],
+        promoCodes: []
     }
 ];
 

@@ -79,12 +79,8 @@ function EventList() {
   }, [searchParams]);
 
   useEffect(() => {
-    const now = new Date();
     const newFilteredEvents = events.filter((event) => {
       const eventDate = event.date ? new Date(event.date) : null;
-      if (!eventDate || eventDate < now) {
-          return false;
-      }
 
       const searchLower = filters.search.toLowerCase();
       if (
