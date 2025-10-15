@@ -1,3 +1,82 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "A vibrant music concert with a large crowd and stage lights.",
+      "imageUrl": "https://picsum.photos/seed/1/600/400",
+      "imageHint": "music concert"
+    },
+    {
+      "id": "2",
+      "description": "A professional tech conference with attendees networking.",
+      "imageUrl": "https://picsum.photos/seed/2/600/400",
+      "imageHint": "tech conference"
+    },
+    {
+      "id": "3",
+      "description": "A modern art exhibition with abstract paintings on the walls.",
+      "imageUrl": "https://picsum.photos/seed/3/600/400",
+      "imageHint": "art exhibition"
+    },
+    {
+      "id": "4",
+      "description": "A bustling outdoor food festival with various food stalls.",
+      "imageUrl": "https://picsum.photos/seed/4/600/400",
+      "imageHint": "food festival"
+    },
+    {
+      "id": "5",
+      "description": "A thrilling sports game in a packed stadium.",
+      "imageUrl": "https://picsum.photos/seed/5/600/400",
+      "imageHint": "sports game"
+    },
+    {
+      "id": "6",
+      "description": "A friendly community meetup in a local park.",
+      "imageUrl": "https://picsum.photos/seed/6/600/400",
+      "imageHint": "community meetup"
+    },
+    {
+      "id": "7",
+      "description": "A serene yoga workshop with participants in various poses.",
+      "imageUrl": "https://picsum.photos/seed/7/600/400",
+      "imageHint": "yoga workshop"
+    },
+    {
+      "id": "8",
+      "description": "A formal business seminar with a speaker on stage.",
+      "imageUrl": "https://picsum.photos/seed/8/600/400",
+      "imageHint": "business seminar"
+    },
+    {
+      "id": "9",
+      "description": "People participating in a charity run for a cause.",
+      "imageUrl": "https://picsum.photos/seed/9/600/400",
+      "imageHint": "charity run"
+    },
+    {
+      "id": "10",
+      "description": "A dramatic theater show with actors on a lit stage.",
+      "imageUrl": "https://picsum.photos/seed/10/600/400",
+      "imageHint": "theater show"
+    },
+    {
+      "id": "11",
+      "description": "A stand-up comedian performing at a comedy night.",
+      "imageUrl": "https://picsum.photos/seed/11/600/400",
+      "imageHint": "comedy night"
+    },
+    {
+      "id": "12",
+      "description": "An author reading from their book to an attentive audience.",
+      "imageUrl": "https://picsum.photos/seed/12/600/400",
+      "imageHint": "book reading"
+    },
+    {
+      "id": "13",
+      "description": "A person looking at a laptop screen.",
+      "imageUrl": "https://picsum.photos/seed/user_avatar/40/40",
+      "imageHint": "user avatar"
+    }
+  ]
 }
