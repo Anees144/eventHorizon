@@ -1,7 +1,7 @@
 
 'use client';
 
-import { collection, addDoc, serverTimestamp, getDocs, getFirestore, query, where, orderBy, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getFirestore, query, where, orderBy, doc, getDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import type { Event } from './types';
 import { initialEvents } from './data';
@@ -23,7 +23,7 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         imageUrl: eventData.imageUrl,
         imageHint: eventData.imageHint,
         visibility: eventData.visibility,
-        date: eventData.date ? new Date(eventData.date) : new Date(),
+        date: eventData.date ? eventData.date.toISOString() : new Date().toISOString(),
         ticketTiers: eventData.ticketTiers,
         promoCodes: eventData.promoCodes,
         organizerId: eventData.organizerId,
@@ -87,11 +87,27 @@ export async function getEventsByOrganizer(organizerId: string): Promise<Event[]
 function processSnapshot(snapshot: any): Event[] {
     return snapshot.docs.map((doc: any) => {
         const data = doc.data();
+        const dateValue = data.date;
+        let isoDate: string;
+
+        if (dateValue && typeof dateValue.toDate === 'function') {
+            // It's a Firestore Timestamp
+            isoDate = dateValue.toDate().toISOString();
+        } else if (typeof dateValue === 'string') {
+            // It's already an ISO string
+            isoDate = dateValue;
+        } else if (dateValue instanceof Date) {
+            // It's a JavaScript Date object
+            isoDate = dateValue.toISOString();
+        } else {
+            // Fallback for unexpected types
+            isoDate = new Date().toISOString();
+        }
+
         return {
             ...data,
             id: doc.id,
-            // Convert Firestore Timestamp to ISO string to ensure serializability
-            date: data.date?.toDate ? data.date.toDate().toISOString() : new Date().toISOString(),
+            date: isoDate,
         } as Event;
     });
 }
@@ -101,10 +117,8 @@ export async function seedInitialEvents() {
     const promises = initialEvents.map(event => {
         // Since we are creating a new object, we can safely remove the 'id' property
         const { id, ...eventData } = event;
-        return addDoc(eventsCollection, {
-            ...eventData,
-            date: new Date(eventData.date)
-        });
+        // The initial data already has dates as ISO strings, so no conversion needed here.
+        return addDoc(eventsCollection, eventData);
     });
     await Promise.all(promises);
 }
