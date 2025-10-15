@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link"
@@ -81,7 +82,7 @@ export default function CreateEventPage() {
   const [tags, setTags] = useState('#synthwave, #80s, #retro, #music');
   const [visibility, setVisibility] = useState<Event['visibility']>('public');
 
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
     { id: 't1-1', name: 'General Admission', type: 'paid', price: 25 },
     { id: 't1-2', name: 'VIP Access', type: 'paid', price: 75 },
@@ -566,3 +567,5 @@ export default function CreateEventPage() {
     </div>
   )
 }
+
+    
