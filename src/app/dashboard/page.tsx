@@ -1,4 +1,5 @@
 
+
 'use client';
 import Link from "next/link"
 import {
@@ -73,7 +74,8 @@ function DashboardPageContent() {
             .filter(e => {
                 if (!searchTerm) return true;
                 return e.title.toLowerCase().includes(searchLower) ||
-                       e.description.toLowerCase().includes(searchLower);
+                       e.description.toLowerCase().includes(searchLower) ||
+                       e.organizer.toLowerCase().includes(searchLower);
             })
             .map(event => {
                 const eventDate = parseISO(event.date);

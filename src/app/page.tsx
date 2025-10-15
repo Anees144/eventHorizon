@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -73,7 +74,8 @@ function EventList() {
       if (
         filters.search &&
         !event.title.toLowerCase().includes(searchLower) &&
-        !event.description.toLowerCase().includes(searchLower)
+        !event.description.toLowerCase().includes(searchLower) &&
+        !event.organizer.toLowerCase().includes(searchLower)
       ) {
         return false;
       }
