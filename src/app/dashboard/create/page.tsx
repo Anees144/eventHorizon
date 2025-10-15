@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link"
@@ -166,6 +167,7 @@ export default function CreateEventPage() {
                     id="name"
                     type="text"
                     className="w-full"
+                    placeholder="Event Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     />
@@ -174,6 +176,7 @@ export default function CreateEventPage() {
                     <Label htmlFor="description">Description (Simple)</Label>
                     <Textarea
                     id="description"
+                    placeholder="A short and catchy description."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="min-h-24"
@@ -183,6 +186,7 @@ export default function CreateEventPage() {
                     <Label htmlFor="description-rich">Description (Rich Text)</Label>
                     <Textarea
                     id="description-rich"
+                    placeholder="Use rich text to describe your event in detail."
                     value={richDescription}
                     onChange={(e) => setRichDescription(e.target.value)}
                     className="min-h-32"
@@ -194,10 +198,34 @@ export default function CreateEventPage() {
 
             <Card>
             <CardHeader>
-                <CardTitle>Category, Date & Location</CardTitle>
+                <CardTitle>Date, Venue & Category</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-6">
+                 <div className="grid gap-3">
+                    <Label htmlFor="date">Date</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start text-left font-normal" id="date">
+                                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                 <div className="grid gap-3">
+                    <Label htmlFor="location">Venue / Location</Label>
+                    <Input
+                    id="location"
+                    type="text"
+                    className="w-full"
+                    placeholder="e.g. Cyber City, Neo-Tokyo"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    />
+                </div>
                 <div className="grid gap-3">
                     <Label htmlFor="category">Category</Label>
                     <Select value={category} onValueChange={setCategory}>
@@ -208,29 +236,6 @@ export default function CreateEventPage() {
                         {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                     </Select>
-                </div>
-                 <div className="grid gap-3">
-                    <Label>Date</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                {date ? format(date, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                 <div className="grid gap-3">
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                    id="location"
-                    type="text"
-                    className="w-full"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    />
                 </div>
                 </div>
             </CardContent>
@@ -434,3 +439,5 @@ export default function CreateEventPage() {
     </div>
   )
 }
+
+    
