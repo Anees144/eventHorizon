@@ -1,9 +1,14 @@
+'use client';
+
 import Link from "next/link"
+import { useState } from "react"
 import {
   ChevronLeft,
   PlusCircle,
   Upload,
+  Trash2,
 } from "lucide-react"
+import { format } from "date-fns"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -40,9 +45,57 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { categories } from "@/lib/data"
+import type { TicketTier, PromoCode } from "@/lib/types";
 
 
 export default function CreateEventPage() {
+  const [date, setDate] = useState<Date>()
+  const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
+    { name: 'General Admission', type: 'paid', price: 25 },
+    { name: 'VIP Access', type: 'paid', price: 75 },
+    { name: 'Free Reservation', type: 'reservation', price: 0 },
+  ]);
+  const [promoCodes, setPromoCodes] = useState<Partial<PromoCode>[]>([
+    { code: 'EARLYBIRD10', discountPercentage: 10 },
+  ]);
+
+  const addTier = () => {
+    setTicketTiers([...ticketTiers, { name: '', type: 'paid', price: 0 }]);
+  };
+
+  const removeTier = (index: number) => {
+    setTicketTiers(ticketTiers.filter((_, i) => i !== index));
+  };
+  
+  const handleTierChange = (index: number, field: keyof TicketTier, value: any) => {
+    const updatedTiers = [...ticketTiers];
+    const tier = updatedTiers[index];
+    if (tier) {
+        (tier[field] as any) = value;
+        if(field === 'type' && value !== 'paid') {
+            tier.price = 0;
+        }
+    }
+    setTicketTiers(updatedTiers);
+  };
+  
+  const addPromoCode = () => {
+    setPromoCodes([...promoCodes, { code: '', discountPercentage: 0 }]);
+  };
+
+  const removePromoCode = (index: number) => {
+    setPromoCodes(promoCodes.filter((_, i) => i !== index));
+  };
+
+  const handlePromoCodeChange = (index: number, field: keyof PromoCode, value: any) => {
+      const updatedPromoCodes = [...promoCodes];
+      const promoCode = updatedPromoCodes[index];
+      if (promoCode) {
+        (promoCode[field] as any) = value;
+      }
+      setPromoCodes(updatedPromoCodes);
+  };
+
   return (
     <div className="grid flex-1 items-start gap-4 md:gap-8">
         <div className="mx-auto grid w-full flex-1 auto-rows-max gap-4">
@@ -122,82 +175,51 @@ export default function CreateEventPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
-                            <TableCell className="font-semibold">General Admission</TableCell>
-                            <TableCell>
-                                 <Select defaultValue="paid">
-                                    <SelectTrigger aria-label="Select type">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="paid">Paid</SelectItem>
-                                        <SelectItem value="reservation">Reservation</SelectItem>
-                                        <SelectItem value="donation">Donation</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </TableCell>
-                            <TableCell>
-                                <Label htmlFor="price-1" className="sr-only">Price</Label>
-                                <Input id="price-1" type="number" defaultValue="25" />
-                            </TableCell>
-                            <TableCell>
-                                <Button aria-label="Delete" variant="outline" size="icon">
-                                <PlusCircle className="h-4 w-4" />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="font-semibold">VIP Access</TableCell>
-                             <TableCell>
-                                 <Select defaultValue="paid">
-                                    <SelectTrigger aria-label="Select type">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="paid">Paid</SelectItem>
-                                        <SelectItem value="reservation">Reservation</SelectItem>
-                                        <SelectItem value="donation">Donation</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </TableCell>
-                            <TableCell>
-                                <Label htmlFor="price-2" className="sr-only">Price</Label>
-                                <Input id="price-2" type="number" defaultValue="75" />
-                            </TableCell>
-                            <TableCell>
-                                <Button aria-label="Delete" variant="outline" size="icon" >
-                                <PlusCircle className="h-4 w-4" />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                         <TableRow>
-                            <TableCell className="font-semibold">Free Reservation</TableCell>
-                             <TableCell>
-                                 <Select defaultValue="reservation">
-                                    <SelectTrigger aria-label="Select type">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="paid">Paid</SelectItem>
-                                        <SelectItem value="reservation">Reservation</SelectItem>
-                                        <SelectItem value="donation">Donation</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </TableCell>
-                            <TableCell>
-                                <Input type="number" disabled value="0" />
-                            </TableCell>
-                            <TableCell>
-                                <Button aria-label="Delete" variant="outline" size="icon">
-                                <PlusCircle className="h-4 w-4" />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
+                        {ticketTiers.map((tier, index) => (
+                            <TableRow key={index}>
+                                <TableCell className="font-semibold">
+                                    <Input 
+                                        value={tier.name}
+                                        onChange={(e) => handleTierChange(index, 'name', e.target.value)}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Select 
+                                        value={tier.type}
+                                        onValueChange={(value) => handleTierChange(index, 'type', value)}
+                                    >
+                                        <SelectTrigger aria-label="Select type">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="paid">Paid</SelectItem>
+                                            <SelectItem value="reservation">Reservation</SelectItem>
+                                            <SelectItem value="donation">Donation</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
+                                <TableCell>
+                                    <Label htmlFor={`price-${index}`} className="sr-only">Price</Label>
+                                    <Input 
+                                        id={`price-${index}`} 
+                                        type="number" 
+                                        value={tier.price}
+                                        onChange={(e) => handleTierChange(index, 'price', parseFloat(e.target.value))}
+                                        disabled={tier.type !== 'paid'}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Button aria-label="Delete" variant="outline" size="icon" onClick={() => removeTier(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                     </Table>
                 </CardContent>
                 <CardFooter className="justify-center border-t p-4">
-                    <Button size="sm" variant="ghost" className="gap-1">
+                    <Button size="sm" variant="ghost" className="gap-1" onClick={addTier}>
                     <PlusCircle className="h-3.5 w-3.5" />
                     Add Tier
                     </Button>
@@ -222,20 +244,33 @@ export default function CreateEventPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell><Input defaultValue="EARLYBIRD10" /></TableCell>
-                                <TableCell><Input type="number" defaultValue="10" /></TableCell>
-                                <TableCell>
-                                    <Button aria-label="Delete" variant="outline" size="icon" >
-                                    <PlusCircle className="h-4 w-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
+                           {promoCodes.map((code, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>
+                                        <Input 
+                                            value={code.code}
+                                            onChange={(e) => handlePromoCodeChange(index, 'code', e.target.value)}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Input 
+                                            type="number" 
+                                            value={code.discountPercentage}
+                                            onChange={(e) => handlePromoCodeChange(index, 'discountPercentage', parseInt(e.target.value))}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button aria-label="Delete" variant="outline" size="icon" onClick={() => removePromoCode(index)}>
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                           ))}
                         </TableBody>
                         </Table>
                     </CardContent>
                      <CardFooter className="justify-center border-t p-4">
-                        <Button size="sm" variant="ghost" className="gap-1">
+                        <Button size="sm" variant="ghost" className="gap-1" onClick={addPromoCode}>
                         <PlusCircle className="h-3.5 w-3.5" />
                         Add Promo Code
                         </Button>
@@ -267,10 +302,12 @@ export default function CreateEventPage() {
                         <Label>Date</Label>
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal">Pick a date</Button>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
-                                <Calendar mode="single" initialFocus />
+                                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
                             </PopoverContent>
                         </Popover>
                     </div>
