@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
+import { ThemeToggle } from './theme-toggle';
 
 export function MainHeader() {
   const router = useRouter();
@@ -25,13 +26,11 @@ export function MainHeader() {
   );
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    router.push(`${pathname}?${createQueryString('search', e.target.value)}`);
+    router.push(`/?${createQueryString('search', e.target.value)}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // The search is already applied on change, so we can just prevent form submission
-    // Or we can explicitly trigger it again if needed.
   };
 
   return (
@@ -75,6 +74,7 @@ export function MainHeader() {
             </form>
           </div>
           <nav className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
             </Button>
