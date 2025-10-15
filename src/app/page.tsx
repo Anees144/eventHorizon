@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import type { DateRange } from 'react-day-picker';
 
 import { events } from '@/lib/data';
 import { EventCard } from '@/components/events/event-card';
@@ -27,9 +28,16 @@ function EventList() {
   const [filters, setFilters] = useState<FilterState>({
     category: searchParams.get('category') ?? 'all',
     location: searchParams.get('location') ?? '',
-    date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
+    date: (() => {
+        const from = searchParams.get('from');
+        const to = searchParams.get('to');
+        if (from && to) return { from: new Date(from), to: new Date(to) };
+        if (from) return { from: new Date(from), to: undefined };
+        return undefined;
+    })(),
     search: searchParams.get('search') ?? '',
     radius: Number(searchParams.get('radius')) || 50,
+    price: [0, 500],
   });
 
   useEffect(() => {
@@ -41,7 +49,7 @@ function EventList() {
             lon: position.coords.longitude,
           });
         },
-        (error) => {
+        () => {
           // Fallback or default location if user denies permission
           setUserLocation({ lat: 40.7128, lon: -74.0060 }); // Default to NYC
         }
@@ -53,13 +61,21 @@ function EventList() {
   }, []);
 
   useEffect(() => {
-    setFilters({
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    let dateRange: DateRange | undefined = undefined;
+    if (from) {
+        dateRange = { from: new Date(from), to: to ? new Date(to) : undefined };
+    }
+
+    setFilters(prev => ({
+      ...prev,
       category: searchParams.get('category') ?? 'all',
       location: searchParams.get('location') ?? '',
-      date: searchParams.get('date') ? new Date(searchParams.get('date')!) : null,
+      date: dateRange,
       search: searchParams.get('search') ?? '',
       radius: Number(searchParams.get('radius')) || 50,
-    });
+    }));
   }, [searchParams]);
 
   useEffect(() => {
@@ -88,12 +104,16 @@ function EventList() {
       ) {
         return false;
       }
-      if (filters.date) {
-          const filterDate = filters.date;
-          if (eventDate.getFullYear() !== filterDate.getFullYear() ||
-              eventDate.getMonth() !== filterDate.getMonth() ||
-              eventDate.getDate() !== filterDate.getDate()) {
-              return false;
+      
+      if (filters.date?.from) {
+          if (!eventDate) return false;
+          const fromDate = new Date(filters.date.from);
+          fromDate.setHours(0,0,0,0);
+          if (eventDate < fromDate) return false;
+          if (filters.date.to) {
+              const toDate = new Date(filters.date.to);
+              toDate.setHours(23,59,59,999);
+              if (eventDate > toDate) return false;
           }
       }
 
@@ -104,6 +124,12 @@ function EventList() {
           }
       }
       
+      const maxPrice = event.ticketTiers.reduce((max, tier) => tier.type === 'paid' ? Math.max(max, tier.price) : max, 0);
+      if (maxPrice < filters.price[0] || maxPrice > filters.price[1]) {
+          if(filters.price[1] < 500 || filters.price[0] > 0) // only filter if user has changed price
+            return false;
+      }
+
       return true;
     });
     setFilteredEvents(newFilteredEvents);
@@ -130,9 +156,10 @@ function HomePageContent() {
     const [filters, setFilters] = useState<FilterState>({
         category: 'all',
         location: '',
-        date: null,
+        date: undefined,
         search: '',
         radius: 50,
+        price: [0, 500],
     });
     const [recommendedEvents, setRecommendedEvents] = useState<Event[] | null>(null);
     const [nearbyEvents, setNearbyEvents] = useState<Event[]>([]);

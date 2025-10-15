@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, MapPin, Tag, X } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Tag, X, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 
 import { categories } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -37,51 +38,79 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
 
   const [category, setCategory] = useState(searchParams.get('category') ?? 'all');
   const [location, setLocation] = useState(searchParams.get('location') ?? '');
-  const [date, setDate] = useState<Date | undefined>(
-    searchParams.get('date') ? new Date(searchParams.get('date')!) : undefined
-  );
+  const [date, setDate] = useState<DateRange | undefined>(() => {
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    if (from && to) {
+      return { from: new Date(from), to: new Date(to) };
+    }
+    return undefined;
+  });
   const [radius, setRadius] = useState(Number(searchParams.get('radius')) || 50);
+  const [price, setPrice] = useState<number[]>([0, 500]);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
 
   useEffect(() => {
     onFilterChange({
         category,
         location,
-        date: date ?? null,
+        date,
         search,
         radius,
+        price,
     })
-  }, [category, location, date, search, radius, onFilterChange]);
+  }, [category, location, date, search, radius, price, onFilterChange]);
 
   const updateQueryParam = (key: string, value: string | number | null) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value && value !== 'all') {
+    if (value !== null && value !== 'all' && value.toString().length > 0) {
       params.set(key, String(value));
     } else {
       params.delete(key);
     }
-    router.push(`?${params.toString()}`);
+    return params;
   }
+  
+  const updateDateQueryParams = (dateRange: DateRange | undefined) => {
+    let params = new URLSearchParams(searchParams.toString());
+    if (dateRange?.from) {
+      params.set('from', format(dateRange.from, 'yyyy-MM-dd'));
+    } else {
+      params.delete('from');
+    }
+    if (dateRange?.to) {
+      params.set('to', format(dateRange.to, 'yyyy-MM-dd'));
+    } else {
+      params.delete('to');
+    }
+    router.push(`?${params.toString()}`);
+  };
+
 
   const handleCategoryChange = (value: string) => {
     setCategory(value);
-    updateQueryParam('category', value);
+    router.push(`?${updateQueryParam('category', value).toString()}`);
   }
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setLocation(value);
-    updateQueryParam('location', value);
+    router.push(`?${updateQueryParam('location', value).toString()}`);
   }
 
-  const handleDateChange = (selectedDate: Date | undefined) => {
+  const handleDateChange = (selectedDate: DateRange | undefined) => {
     setDate(selectedDate);
-    updateQueryParam('date', selectedDate ? selectedDate.toISOString().split('T')[0] : null);
+    updateDateQueryParams(selectedDate);
   }
   
   const handleRadiusChange = (value: number[]) => {
     setRadius(value[0]);
-    updateQueryParam('radius', value[0]);
+    router.push(`?${updateQueryParam('radius', value[0]).toString()}`);
+  }
+  
+  const handlePriceChange = (value: number[]) => {
+    setPrice(value);
+    // Note: We are not updating URL for price for now to keep it clean.
   }
 
   const handleClearFilters = () => {
@@ -89,16 +118,17 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
     setLocation('');
     setDate(undefined);
     setRadius(50);
+    setPrice([0, 500]);
     setSearch('');
     router.push('?');
   }
 
   return (
     <Card className="z-10 shadow-lg">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-[2fr_2fr_2fr_3fr_1fr]">
-          <div className="space-y-1.5">
-             <Label htmlFor='category-select'>Category</Label>
+      <CardContent className="p-4 space-y-4">
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-4">
+           <div className="space-y-1.5">
+             <Label>Category</Label>
             <div className="relative">
               <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Select value={category} onValueChange={handleCategoryChange}>
@@ -117,7 +147,7 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
             </div>
           </div>
           <div className="space-y-1.5">
-             <Label htmlFor='location-input'>Location</Label>
+             <Label>Location</Label>
              <div className="relative">
               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
@@ -134,31 +164,57 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant={'outline'}
+                  id="date"
+                  variant={"outline"}
                   className={cn(
-                    'w-full justify-start text-left font-normal pl-9',
-                    !date && 'text-muted-foreground'
+                    "w-full justify-start text-left font-normal pl-9",
+                    !date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1\
-/2 text-muted-foreground" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  <CalendarIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd, y")} -{" "}
+                        {format(date.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Pick a date range</span>
+                  )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={date} onSelect={handleDateChange} initialFocus />
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={handleDateChange}
+                  numberOfMonths={2}
+                />
               </PopoverContent>
             </Popover>
           </div>
-            <div className="space-y-3">
-                 <Label>Radius ({radius} km)</Label>
-                <Slider defaultValue={[radius]} max={200} step={5} onValueChange={handleRadiusChange} />
-            </div>
-           <Button variant="ghost" onClick={handleClearFilters} className="w-full text-muted-foreground">
-            <X className="mr-2 h-4 w-4" />
-            Clear
-          </Button>
+           <div className="space-y-1.5 pt-1">
+             <Label>Radius ({radius} km)</Label>
+            <Slider defaultValue={[radius]} max={200} step={5} onValueChange={handleRadiusChange} />
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-[3fr_1fr]">
+            <div className="space-y-1.5 pt-1">
+                 <Label>Price Range (${price[0]} - ${price[1]})</Label>
+                <Slider defaultValue={price} max={500} step={10} onValueChange={handlePriceChange} />
+            </div>
+            <Button variant="ghost" onClick={handleClearFilters} className="w-full text-muted-foreground">
+                <X className="mr-2 h-4 w-4" />
+                Clear All Filters
+            </Button>
+        </div>
+
       </CardContent>
     </Card>
   );

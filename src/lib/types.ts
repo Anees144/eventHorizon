@@ -1,3 +1,5 @@
+import type { DateRange } from "react-day-picker";
+
 export type User = {
   id: string;
   name: string;
@@ -35,9 +37,10 @@ export type TicketTier = {
 export type FilterState = {
     category: string;
     location: string;
-    date: Date | null;
+    date: DateRange | undefined;
     search: string;
     radius: number;
+    price: number[];
 }
 
 export type PromoCode = {
