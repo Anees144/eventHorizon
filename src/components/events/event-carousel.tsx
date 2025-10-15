@@ -13,9 +13,11 @@ import { EventCard } from './event-card';
 
 type EventCarouselProps = {
   events: Event[];
+  onCompareChange: (eventId: string, isSelected: boolean) => void;
+  compareList: string[];
 };
 
-export function EventCarousel({ events }: EventCarouselProps) {
+export function EventCarousel({ events, onCompareChange, compareList }: EventCarouselProps) {
   return (
     <Carousel
       opts={{
@@ -28,7 +30,11 @@ export function EventCarousel({ events }: EventCarouselProps) {
         {events.map((event) => (
           <CarouselItem key={event.id} className="basis-full pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
             <div className="p-1">
-              <EventCard event={event} />
+              <EventCard 
+                event={event} 
+                onCompareChange={onCompareChange}
+                isComparing={compareList.includes(event.id)}
+              />
             </div>
           </CarouselItem>
         ))}

@@ -18,9 +18,10 @@ import { getDistance } from '@/lib/utils';
 import { getRecommendedEventsAction } from './dashboard/recommendations/actions';
 import { Button } from '@/components/ui/button';
 import { EventCarousel } from '@/components/events/event-carousel';
+import { CompareButton } from '@/components/events/compare-button';
 
 
-function EventList() {
+function EventList({ onCompareChange, compareList }: { onCompareChange: (eventId: string, isSelected: boolean) => void; compareList: string[] }) {
   const searchParams = useSearchParams();
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
@@ -106,13 +107,15 @@ function EventList() {
           if (!eventDate) return false;
           const fromDate = new Date(filters.date.from);
           fromDate.setHours(0,0,0,0);
-          if (eventDate < fromDate) return false;
+          // Don't filter out past events
+          // if (eventDate < fromDate) return false; 
           if (filters.date.to) {
               const toDate = new Date(filters.date.to);
               toDate.setHours(23,59,59,999);
               if (eventDate > toDate) return false;
           }
       }
+
 
       if (userLocation && event.latitude && event.longitude) {
           const distance = getDistance(userLocation.lat, userLocation.lon, event.latitude, event.longitude);
@@ -137,7 +140,12 @@ function EventList() {
     <div className="grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-6">
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event) => (
-          <EventCard key={event.id} event={event} />
+          <EventCard 
+            key={event.id} 
+            event={event} 
+            onCompareChange={onCompareChange}
+            isComparing={compareList.includes(event.id)}
+          />
         ))
       ) : (
         <div className="col-span-full text-center text-muted-foreground py-10">
@@ -162,6 +170,13 @@ function HomePageContent() {
     const [nearbyEvents, setNearbyEvents] = useState<Event[]>([]);
     const [trendingEvents] = useState<Event[]>(() => events.slice(0, 5));
     const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
+    const [compareList, setCompareList] = useState<string[]>([]);
+
+    const handleCompareChange = (eventId: string, isSelected: boolean) => {
+        setCompareList(prev => 
+            isSelected ? [...prev, eventId] : prev.filter(id => id !== eventId)
+        );
+    };
 
     useEffect(() => {
         getRecommendedEventsAction().then(result => {
@@ -240,7 +255,11 @@ function HomePageContent() {
                                 <Link href="/?search=">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
                             </Button>
                         </div>
-                        <EventCarousel events={trendingEvents} />
+                        <EventCarousel 
+                            events={trendingEvents} 
+                            onCompareChange={handleCompareChange}
+                            compareList={compareList}
+                        />
                     </div>
 
                     {/* Nearby Events Section */}
@@ -252,7 +271,11 @@ function HomePageContent() {
                                 <Link href="/?radius=25">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
                                 </Button>
                             </div>
-                            <EventCarousel events={nearbyEvents} />
+                            <EventCarousel 
+                                events={nearbyEvents} 
+                                onCompareChange={handleCompareChange}
+                                compareList={compareList}
+                            />
                         </div>
                     )}
 
@@ -265,7 +288,11 @@ function HomePageContent() {
                                     <Link href="/dashboard/recommendations">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
                                 </Button>
                             </div>
-                           <EventCarousel events={recommendedEvents} />
+                           <EventCarousel 
+                                events={recommendedEvents} 
+                                onCompareChange={handleCompareChange}
+                                compareList={compareList}
+                            />
                         </div>
                     )}
 
@@ -275,10 +302,11 @@ function HomePageContent() {
                     <div className="container mb-8">
                         <h2 className="font-headline text-3xl font-bold">All Events</h2>
                     </div>
-                    <EventList />
+                    <EventList onCompareChange={handleCompareChange} compareList={compareList} />
                 </section>
 
             </main>
+            {compareList.length > 0 && <CompareButton compareList={compareList} />}
             <footer className="border-t bg-card">
                 <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
                     <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">

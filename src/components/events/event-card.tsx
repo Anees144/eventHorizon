@@ -21,12 +21,16 @@ import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { Button } from '../ui/button';
 import { useDoc } from '@/firebase/firestore/use-doc';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
 
 type EventCardProps = {
   event: Event;
+  onCompareChange: (eventId: string, isSelected: boolean) => void;
+  isComparing: boolean;
 };
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ event, onCompareChange, isComparing }: EventCardProps) {
   const [formattedDate, setFormattedDate] = useState('');
   const { user } = useUser();
   const firestore = useFirestore();
@@ -58,6 +62,13 @@ export function EventCard({ event }: EventCardProps) {
         savedEvents: arrayUnion(event.id),
       });
     }
+  };
+  
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const checkbox = e.currentTarget.querySelector('button[role="checkbox"]') as HTMLButtonElement | null;
+    checkbox?.click();
   };
 
   return (
@@ -107,6 +118,19 @@ export function EventCard({ event }: EventCardProps) {
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span>{event.location}</span>
+          </div>
+           <div 
+            className="flex items-center space-x-2 mt-2 cursor-pointer w-full"
+            onClick={handleCompareClick}
+          >
+            <Checkbox 
+                id={`compare-${event.id}`}
+                checked={isComparing}
+                onCheckedChange={(checked) => onCompareChange(event.id, !!checked)}
+            />
+            <Label htmlFor={`compare-${event.id}`} className="text-sm font-medium leading-none cursor-pointer">
+              Compare
+            </Label>
           </div>
         </CardFooter>
       </Card>
