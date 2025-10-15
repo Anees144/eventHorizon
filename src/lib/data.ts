@@ -1,3 +1,4 @@
+
 import type { Event, User } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
@@ -370,6 +371,79 @@ export const events: Event[] = [
         organizerId: 'user-1',
         ticketTiers: [
             { id: 't19-1', name: 'Attendance', price: 0 }
+        ]
+    },
+    {
+        id: '20',
+        title: 'Laugh Riot Comedy Night',
+        description: 'Get ready for a night of non-stop laughter with the city\'s best comedians.',
+        richDescription: '<p><strong>Laugh Riot Comedy Night</strong> is your weekly dose of humor. Featuring a lineup of up-and-coming talent and seasoned pros, this is the perfect way to unwind and have a good time.</p>',
+        imageUrl: getImage('comedy night').imageUrl,
+        imageHint: 'comedy night',
+        category: 'Art',
+        date: '2024-10-18T20:00:00.000Z',
+        location: 'The Funny Bone, Chicago',
+        latitude: 41.8781,
+        longitude: -87.6298,
+        organizer: 'Comedy Central',
+        organizerId: 'user-4',
+        ticketTiers: [
+            { id: 't20-1', name: 'General Admission', price: 20 }
+        ]
+    },
+    {
+        id: '21',
+        title: 'An Evening with the Author',
+        description: 'Join a bestselling author for a reading and Q&A session for their new novel.',
+        richDescription: '<p>Don\'t miss <strong>An Evening with the Author</strong>, a special event featuring a reading from a new critically acclaimed novel, followed by an intimate Q&A session and book signing. A wonderful opportunity for book lovers to connect with a favorite writer.</p>',
+        imageUrl: getImage('book reading').imageUrl,
+        imageHint: 'book reading',
+        category: 'Art',
+        date: '2024-11-01T19:00:00.000Z',
+        location: 'City Library, San Francisco',
+        latitude: 37.7749,
+        longitude: -122.4194,
+        organizer: 'Readers Hub',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't21-1', name: 'Free Entry', price: 0 }
+        ]
+    },
+    {
+        id: '22',
+        title: 'Run for a Cause 5K',
+        description: 'Lace up your running shoes for a charity 5K run to support local shelters.',
+        richDescription: '<p>The annual <strong>Run for a Cause 5K</strong> is a fantastic way to get active while supporting a great cause. All proceeds from the race will go directly to supporting local homeless shelters. Runners and walkers of all ages and abilities are welcome.</p>',
+        imageUrl: getImage('charity run').imageUrl,
+        imageHint: 'charity run',
+        category: 'Community',
+        date: '2024-09-22T09:00:00.000Z',
+        location: 'Lakeside Path, Toronto',
+        latitude: 43.6532,
+        longitude: -79.3832,
+        organizer: 'Toronto Cares Foundation',
+        organizerId: 'user-1',
+        ticketTiers: [
+            { id: 't22-1', name: 'Runner Registration', price: 30 }
+        ]
+    },
+    {
+        id: '23',
+        title: 'Indie Film Festival',
+        description: 'A showcase of groundbreaking independent films from around the world.',
+        richDescription: '<p>The <strong>Indie Film Festival</strong> is back for its 10th year, celebrating the art of storytelling through film. Join us for a week of screenings, filmmaker panels, and networking events. Discover the next generation of cinematic talent.</p>',
+        imageUrl: getImage('theater show').imageUrl,
+        imageHint: 'theater show',
+        category: 'Art',
+        date: '2024-10-25T17:00:00.000Z',
+        location: 'The Indieplex, Austin',
+        latitude: 30.2672,
+        longitude: -97.7431,
+        organizer: 'Film Enthusiasts Society',
+        organizerId: 'user-3',
+        ticketTiers: [
+            { id: 't23-1', name: 'Day Pass', price: 40 },
+            { id: 't23-2', name: 'Full Festival Pass', price: 150 }
         ]
     }
 ];
