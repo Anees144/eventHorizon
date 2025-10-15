@@ -36,6 +36,7 @@ export type Event = {
   longitude: number;
   promoCodes: PromoCode[];
   tags?: string[];
+  visibility: 'public' | 'private' | 'invite-only';
 };
 
 export type TicketTier = {

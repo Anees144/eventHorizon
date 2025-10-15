@@ -16,7 +16,8 @@ import {
   Star,
   UserPlus,
   Youtube,
-  Tag
+  Tag,
+  Lock,
 } from "lucide-react"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
 import Image from "next/image"
@@ -56,7 +57,7 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { categories } from "@/lib/data"
-import type { TicketTier, PromoCode } from "@/lib/types";
+import type { TicketTier, PromoCode, Event } from "@/lib/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { VideoEmbed } from "@/components/events/video-embed";
@@ -72,6 +73,7 @@ export default function CreateEventPage() {
   const [imageHint, setImageHint] = useState('music concert');
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
   const [tags, setTags] = useState('#synthwave, #80s, #retro, #music');
+  const [visibility, setVisibility] = useState<Event['visibility']>('public');
 
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
@@ -262,16 +264,31 @@ export default function CreateEventPage() {
                     onChange={(e) => setLocation(e.target.value)}
                     />
                 </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="category">Category</Label>
-                    <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger id="category" aria-label="Select category">
-                        <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="grid gap-3">
+                        <Label htmlFor="category">Category</Label>
+                        <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger id="category" aria-label="Select category">
+                            <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="grid gap-3">
+                        <Label htmlFor="visibility">Visibility</Label>
+                         <Select value={visibility} onValueChange={(value: Event['visibility']) => setVisibility(value)}>
+                            <SelectTrigger id="visibility" aria-label="Select visibility">
+                                <SelectValue placeholder="Select visibility" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="public">Public</SelectItem>
+                                <SelectItem value="private">Private</SelectItem>
+                                <SelectItem value="invite-only">Invite-Only</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 </div>
             </CardContent>

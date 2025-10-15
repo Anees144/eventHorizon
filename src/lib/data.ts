@@ -33,6 +33,7 @@ export const events: Event[] = [
         organizer: 'RetroWave Productions',
         organizerId: 'user-1',
         tags: ['#synthwave', '#80s', '#retro', '#music'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't1-1', name: 'General Admission', price: 25, type: 'paid' },
             { id: 't1-2', name: 'VIP Access', price: 75, type: 'paid' },
@@ -58,6 +59,7 @@ export const events: Event[] = [
         organizer: 'TechForward',
         organizerId: 'user-2',
         tags: ['#AI', '#MachineLearning', '#Tech', '#Innovation'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't2-1', name: 'Student Pass', price: 100, type: 'paid' },
             { id: 't2-2', name: 'Full Access', price: 400, type: 'paid' },
@@ -81,6 +83,7 @@ export const events: Event[] = [
         organizer: 'ArtConnect',
         organizerId: 'user-3',
         tags: ['#art', '#exhibition', '#digitalart', '#modernart'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't3-1', name: 'Single Entry', price: 15, type: 'paid' },
         ],
@@ -102,6 +105,7 @@ export const events: Event[] = [
         organizer: 'TasteMakers Inc.',
         organizerId: 'user-1',
         tags: ['#food', '#festival', '#streetfood', '#familyfriendly'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't4-1', name: 'Entry', price: 10, type: 'paid' },
             { id: 't4-2', name: 'Tasting Passport', price: 50, type: 'paid' },
@@ -124,6 +128,7 @@ export const events: Event[] = [
         organizer: 'Innovate UK',
         organizerId: 'user-2',
         tags: ['#startup', '#pitch', '#vc', '#entrepreneur'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't5-1', name: 'Spectator', price: 20, type: 'paid' },
             { id: 't5-2', name: 'Investor Access', price: 150, type: 'paid' },
@@ -146,6 +151,7 @@ export const events: Event[] = [
         organizer: 'ZenLife',
         organizerId: 'user-3',
         tags: ['#yoga', '#meditation', '#wellness', '#retreat'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't6-1', name: 'All-Inclusive Weekend', price: 500, type: 'paid' },
         ],
@@ -167,6 +173,7 @@ export const events: Event[] = [
         organizer: 'SoundWave Events',
         organizerId: 'user-1',
         tags: ['#indierock', '#musicfestival', '#livemusic'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't7-1', name: 'Early Bird', price: 40, type: 'paid' },
             { id: 't7-2', name: 'General Admission', price: 60, type: 'paid' },
@@ -189,6 +196,7 @@ export const events: Event[] = [
         organizer: 'CryptoCon',
         organizerId: 'user-2',
         tags: ['#web3', '#blockchain', '#crypto', '#nft'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't8-1', name: 'Virtual Pass', price: 50, type: 'paid' },
             { id: 't8-2', name: 'VIP Virtual Pass', price: 150, type: 'paid' },
@@ -211,6 +219,7 @@ export const events: Event[] = [
         organizer: 'Modern Bard Company',
         organizerId: 'user-3',
         tags: ['#theater', '#shakespeare', '#play', '#drama'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't9-1', name: 'Balcony', price: 45, type: 'paid' },
             { id: 't9-2', name: 'Orchestra', price: 85, type: 'paid' },
@@ -233,6 +242,7 @@ export const events: Event[] = [
         organizer: 'National Basketball League',
         organizerId: 'user-4',
         tags: ['#basketball', '#finals', '#sports', '#nbl'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't10-1', name: 'Upper Bowl', price: 80, type: 'paid' },
             { id: 't10-2', name: 'Lower Bowl', price: 250, type: 'paid' },
@@ -256,6 +266,7 @@ export const events: Event[] = [
         organizer: 'Springfield Action Committee',
         organizerId: 'user-1',
         tags: ['#community', '#volunteer', '#cleanup', '#environment'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't11-1', name: 'Volunteer (Free)', price: 0, type: 'reservation' },
             { id: 't11-2', name: 'Support with a Donation', price: 0, type: 'donation' },
@@ -278,6 +289,7 @@ export const events: Event[] = [
         organizer: 'Global Gaming League',
         organizerId: 'user-2',
         tags: ['#esports', '#gaming', '#tournament', '#finals'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't12-1', name: 'Floor Seats', price: 50, type: 'paid' },
             { id: 't12-2', name: 'Stadium Seating', price: 30, type: 'paid' }
@@ -300,6 +312,7 @@ export const events: Event[] = [
         organizer: 'Chicago Jazz Society',
         organizerId: 'user-1',
         tags: ['#jazz', '#livemusic', '#outdoor', '#concert'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't13-1', name: 'Lawn Seating', price: 25, type: 'paid' },
             { id: 't13-2', name: 'Reserved Chair', price: 45, type: 'paid' }
@@ -322,6 +335,7 @@ export const events: Event[] = [
         organizer: 'Urban Canvas Tours',
         organizerId: 'user-3',
         tags: ['#streetart', '#graffiti', '#tour', '#urbanart'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't14-1', name: 'Adult', price: 20, type: 'paid' },
             { id: 't14-2', name: 'Student', price: 15, type: 'paid' }
@@ -344,6 +358,7 @@ export const events: Event[] = [
         organizer: 'Belgian Chocolate School',
         organizerId: 'user-1',
         tags: ['#chocolate', '#workshop', '#dessert', '#culinary'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't15-1', name: 'Workshop Fee', price: 80, type: 'paid' }
         ],
@@ -365,6 +380,7 @@ export const events: Event[] = [
         organizer: 'LeadHers Network',
         organizerId: 'user-2',
         tags: ['#womeninbusiness', '#leadership', '#conference', '#networking'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't16-1', name: 'Early Bird', price: 250, type: 'paid' },
             { id: 't16-2', name: 'General Admission', price: 350, type: 'paid' }
@@ -387,6 +403,7 @@ export const events: Event[] = [
         organizer: 'The Unplugged Movement',
         organizerId: 'user-3',
         tags: ['#digitaldetox', '#mindfulness', '#nature', '#retreat'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't17-1', name: 'Shared Cabin', price: 300, type: 'paid' },
             { id: 't17-2', name: 'Private Cabin', price: 450, type: 'paid' }
@@ -409,6 +426,7 @@ export const events: Event[] = [
         organizer: 'SoCal Sports League',
         organizerId: 'user-4',
         tags: ['#volleyball', '#beach', '#tournament', '#sports'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't18-1', name: 'Team Registration (4 players)', price: 100, type: 'paid' }
         ],
@@ -430,6 +448,7 @@ export const events: Event[] = [
         organizer: 'Maplewood Safety Alliance',
         organizerId: 'user-1',
         tags: ['#community', '#safety', '#neighborhoodwatch'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't19-1', name: 'Attendance', price: 0, type: 'reservation' }
         ],
@@ -451,6 +470,7 @@ export const events: Event[] = [
         organizer: 'Comedy Central',
         organizerId: 'user-4',
         tags: ['#comedy', '#standup', '#humor', '#nightlife'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't20-1', name: 'General Admission', price: 20, type: 'paid' }
         ],
@@ -472,6 +492,7 @@ export const events: Event[] = [
         organizer: 'Readers Hub',
         organizerId: 'user-3',
         tags: ['#books', '#author', '#reading', '#literature'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't21-1', name: 'Free Entry', price: 0, type: 'reservation' }
         ],
@@ -493,6 +514,7 @@ export const events: Event[] = [
         organizer: 'Toronto Cares Foundation',
         organizerId: 'user-1',
         tags: ['#charity', '#5k', '#run', '#community'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't22-1', name: 'Runner Registration', price: 30, type: 'paid' },
             { id: 't22-2', name: 'Support Donation', price: 0, type: 'donation' }
@@ -517,6 +539,7 @@ export const events: Event[] = [
         organizer: 'Film Enthusiasts Society',
         organizerId: 'user-3',
         tags: ['#film', '#independentfilm', '#festival', '#cinema'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't23-1', name: 'Day Pass', price: 40, type: 'paid' },
             { id: 't23-2', name: 'Full Festival Pass', price: 150, type: 'paid' }
@@ -539,6 +562,7 @@ export const events: Event[] = [
         organizer: 'Code for a Cause',
         organizerId: 'user-2',
         tags: ['#hackathon', '#tech', '#socialgood', '#coding'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't24-1', name: 'Participant (Free)', price: 0, type: 'reservation' }
         ],
@@ -560,6 +584,7 @@ export const events: Event[] = [
         organizer: 'City Symphony Orchestra',
         organizerId: 'user-1',
         tags: ['#classical', '#orchestra', '#symphony', '#music'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't25-1', name: 'Standard Seat', price: 60, type: 'paid' },
             { id: 't25-2', name: 'Premium Seat', price: 120, type: 'paid' }
@@ -582,6 +607,7 @@ export const events: Event[] = [
         organizer: 'Mindful Path',
         organizerId: 'user-3',
         tags: ['#meditation', '#silentretreat', '#mindfulness', '#wellness'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't26-1', name: 'Retreat Package', price: 400, type: 'paid' }
         ],
@@ -603,6 +629,7 @@ export const events: Event[] = [
         organizer: 'Napa Culinary Experiences',
         organizerId: 'user-1',
         tags: ['#wine', '#cheese', '#tasting', '#foodie'],
+        visibility: 'public',
         ticketTiers: [
             { id: 't27-1', name: 'Tasting Experience', price: 95, type: 'paid' }
         ],
