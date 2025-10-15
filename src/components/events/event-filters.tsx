@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, MapPin, Search, Tag, X, LocateFixed } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Tag, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { categories } from '@/lib/data';
@@ -97,35 +97,39 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
     <Card className="z-10 shadow-lg">
       <CardContent className="p-4">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-[2fr_2fr_2fr_3fr_1fr]">
-          <div className="relative">
+          <div className="space-y-1.5">
              <Label htmlFor='category-select'>Category</Label>
-            <Tag className="absolute left-3 top-[2.4rem] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Select value={category} onValueChange={handleCategoryChange}>
-              <SelectTrigger id="category-select" className="w-full pl-9">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="relative">
+              <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Select value={category} onValueChange={handleCategoryChange}>
+                <SelectTrigger id="category-select" className="w-full pl-9">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category.toLowerCase()}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="relative">
+          <div className="space-y-1.5">
              <Label htmlFor='location-input'>Location</Label>
-            <MapPin className="absolute left-3 top-[2.4rem] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input 
-                id="location-input"
-                placeholder="Location" 
-                className="pl-9"
-                value={location}
-                onChange={handleLocationChange}
-            />
+             <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input 
+                  id="location-input"
+                  placeholder="Location" 
+                  className="pl-9"
+                  value={location}
+                  onChange={handleLocationChange}
+              />
+            </div>
           </div>
-          <div className="relative">
+          <div className="space-y-1.5">
             <Label>Date</Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -136,7 +140,8 @@ export default function EventFilters({ onFilterChange }: EventFiltersProps) {
                     !date && 'text-muted-foreground'
                   )}
                 >
-                  <CalendarIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <CalendarIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1\
+/2 text-muted-foreground" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
