@@ -144,9 +144,16 @@ export default function EventPage() {
                   className="prose prose-lg mt-4 max-w-none text-foreground/90"
                   dangerouslySetInnerHTML={{ __html: event.richDescription }}
                 />
+                {event.tags && event.tags.length > 0 && (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                        {event.tags.map(tag => (
+                            <Badge key={tag} variant="outline">{tag}</Badge>
+                        ))}
+                    </div>
+                )}
               </div>
             </div>
-            <div className="space-y-8">
+            <div className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="font-headline">Date and Time</CardTitle>
@@ -201,7 +208,7 @@ export default function EventPage() {
                   <CardTitle className="font-headline">Share & Sync</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2">
                     <CalendarButton event={event} />
                     <ShareButton event={event} />
                   </div>

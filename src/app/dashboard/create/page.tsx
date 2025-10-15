@@ -15,7 +15,8 @@ import {
   Eye,
   Star,
   UserPlus,
-  Youtube
+  Youtube,
+  Tag
 } from "lucide-react"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
 import Image from "next/image"
@@ -70,6 +71,7 @@ export default function CreateEventPage() {
   const [imageUrl, setImageUrl] = useState('https://picsum.photos/seed/1/600/400');
   const [imageHint, setImageHint] = useState('music concert');
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  const [tags, setTags] = useState('#synthwave, #80s, #retro, #music');
 
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [ticketTiers, setTicketTiers] = useState<Partial<TicketTier>[]>([
@@ -131,6 +133,8 @@ export default function CreateEventPage() {
         return 'Get Tickets';
     }
   }
+  
+  const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
 
   return (
     <div className="flex-1 items-start">
@@ -165,51 +169,65 @@ export default function CreateEventPage() {
             </CardHeader>
             <CardContent>
                 <div className="grid gap-6">
-                <div className="grid gap-3">
-                    <Label htmlFor="name">Title</Label>
-                    <Input
-                    id="name"
-                    type="text"
-                    className="w-full"
-                    placeholder="Event Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="description">Description (Simple)</Label>
-                    <Textarea
-                    id="description"
-                    placeholder="A short and catchy description."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="min-h-24"
-                    />
-                </div>
-                 <div className="grid gap-3">
-                    <Label htmlFor="rich-description">Description (Rich Text)</Label>
-                    <Textarea
-                    id="rich-description"
-                    placeholder="Use rich text to describe your event in detail. You can use HTML tags like <p>, <strong>, <ul> etc."
-                    value={richDescription}
-                    onChange={(e) => setRichDescription(e.target.value)}
-                    className="min-h-32"
-                    />
-                </div>
-                 <div className="grid gap-3">
-                    <Label htmlFor="video-url">Promotional Video</Label>
-                    <div className="relative">
-                      <Youtube className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="video-url"
-                        type="url"
-                        className="w-full pl-9"
-                        placeholder="e.g. https://www.youtube.com/watch?v=..."
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
-                      />
+                    <div className="grid gap-3">
+                        <Label htmlFor="name">Title</Label>
+                        <Input
+                        id="name"
+                        type="text"
+                        className="w-full"
+                        placeholder="Event Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        />
                     </div>
-                </div>
+                    <div className="grid gap-3">
+                        <Label htmlFor="description">Description (Simple)</Label>
+                        <Textarea
+                        id="description"
+                        placeholder="A short and catchy description."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="min-h-24"
+                        />
+                    </div>
+                    <div className="grid gap-3">
+                        <Label htmlFor="rich-description">Description (Rich Text)</Label>
+                        <Textarea
+                        id="rich-description"
+                        placeholder="Use rich text to describe your event in detail. You can use HTML tags like <p>, <strong>, <ul> etc."
+                        value={richDescription}
+                        onChange={(e) => setRichDescription(e.target.value)}
+                        className="min-h-32"
+                        />
+                    </div>
+                    <div className="grid gap-3">
+                        <Label htmlFor="video-url">Promotional Video</Label>
+                        <div className="relative">
+                        <Youtube className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            id="video-url"
+                            type="url"
+                            className="w-full pl-9"
+                            placeholder="e.g. https://www.youtube.com/watch?v=..."
+                            value={videoUrl}
+                            onChange={(e) => setVideoUrl(e.target.value)}
+                        />
+                        </div>
+                    </div>
+                    <div className="grid gap-3">
+                        <Label htmlFor="tags">Tags</Label>
+                         <div className="relative">
+                            <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                id="tags"
+                                type="text"
+                                className="w-full pl-9"
+                                placeholder="e.g. #synthwave, #80s, #retro"
+                                value={tags}
+                                onChange={(e) => setTags(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </div>
             </CardContent>
             </Card>
@@ -401,6 +419,11 @@ export default function CreateEventPage() {
                   className="prose prose-sm mt-4 max-w-none text-foreground/90"
                   dangerouslySetInnerHTML={{ __html: richDescription }}
                 />
+                 <div className="mt-4 flex flex-wrap gap-2">
+                    {tagList.map(tag => (
+                        <Badge key={tag} variant="outline">{tag}</Badge>
+                    ))}
+                </div>
               </div>
 
               <div className="space-y-4">

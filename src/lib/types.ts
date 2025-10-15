@@ -35,6 +35,7 @@ export type Event = {
   latitude: number;
   longitude: number;
   promoCodes: PromoCode[];
+  tags?: string[];
 };
 
 export type TicketTier = {
