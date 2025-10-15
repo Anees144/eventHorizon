@@ -13,8 +13,7 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
     if (!eventData.organizerId) {
         throw new Error("User must be logged in to create an event.");
     }
-    
-    // Start with a base object of required fields.
+
     const dataToSave: { [key: string]: any } = {
         title: eventData.title,
         description: eventData.description,
@@ -23,6 +22,8 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         location: eventData.location,
         imageUrl: eventData.imageUrl,
         imageHint: eventData.imageHint,
+        videoUrl: eventData.videoUrl,
+        tags: eventData.tags,
         visibility: eventData.visibility,
         date: eventData.date ? new Date(eventData.date) : serverTimestamp(),
         ticketTiers: eventData.ticketTiers,
@@ -33,16 +34,14 @@ export async function createEvent(eventData: Omit<Event, 'id' | 'date'> & { date
         longitude: eventData.longitude,
     };
 
-    // Conditionally add optional fields only if they have a value.
-    if (eventData.videoUrl) {
-        dataToSave.videoUrl = eventData.videoUrl;
-    }
-    if (eventData.tags && eventData.tags.length > 0) {
-        dataToSave.tags = eventData.tags;
-    }
+    // Clean the object: remove any keys with undefined values before sending to Firestore.
+    Object.keys(dataToSave).forEach(key => {
+        if (dataToSave[key] === undefined) {
+            delete dataToSave[key];
+        }
+    });
 
     const docRef = await addDoc(eventsCollection, dataToSave);
-
     return docRef.id;
 }
 
