@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { getRecommendedEventsAction from './actions';
+import { getRecommendedEventsAction } from './actions';
 import { EventCard } from '@/components/events/event-card';
 import type { Event } from '@/lib/types';
 import { getEvents } from '@/lib/events';
