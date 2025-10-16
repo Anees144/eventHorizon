@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 
@@ -13,7 +13,7 @@ import { EventCard } from '@/components/events/event-card';
 import type { Event } from '@/lib/types';
 import { getEvents } from '@/lib/events';
 
-export default function RecommendationsPage() {
+function RecommendationsPageContent() {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<Event[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -109,4 +109,12 @@ export default function RecommendationsPage() {
       </Card>
     </div>
   );
+}
+
+export default function RecommendationsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <RecommendationsPageContent />
+        </Suspense>
+    )
 }

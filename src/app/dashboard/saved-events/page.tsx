@@ -7,10 +7,10 @@ import type { Event, UserProfile } from '@/lib/types';
 import { EventCard } from '@/components/events/event-card';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Bookmark } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { getEvents } from '@/lib/events';
 
-export default function SavedEventsPage() {
+function SavedEventsPageContent() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [allEvents, setAllEvents] = useState<Event[]>([]);
@@ -85,4 +85,13 @@ export default function SavedEventsPage() {
        </Card>
     </div>
   );
+}
+
+
+export default function SavedEventsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SavedEventsPageContent />
+        </Suspense>
+    )
 }

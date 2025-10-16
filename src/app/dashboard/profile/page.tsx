@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useUser, useAuth, useFirestore, useMemoFirebase } from "@/firebase";
 import { updateProfile } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -24,7 +24,7 @@ import { categories } from "@/lib/data";
 import type { UserProfile } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
@@ -242,4 +242,12 @@ export default function ProfilePage() {
         </div>
     </div>
   )
+}
+
+export default function ProfilePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProfilePageContent />
+        </Suspense>
+    )
 }
