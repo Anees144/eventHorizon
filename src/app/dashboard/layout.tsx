@@ -73,15 +73,16 @@ export default function DashboardLayout({
   );
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Always search on the discover page
-    router.push(`/discover?${createQueryString('search', e.target.value)}`);
+    const currentPath = pathname.startsWith('/dashboard') ? '/dashboard' : '/discover';
+    router.push(`${currentPath}?${createQueryString('search', e.target.value)}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const search = formData.get('search') as string;
-    router.push(`/discover?${createQueryString('search', search)}`);
+    const currentPath = pathname.startsWith('/dashboard') ? '/dashboard' : '/discover';
+    router.push(`${currentPath}?${createQueryString('search', search)}`);
   };
 
   return (

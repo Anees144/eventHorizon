@@ -40,15 +40,6 @@ type EventWithFormattedDate = Event & {
     isUpcoming: boolean;
 };
 
-const revenueData = [
-    { month: "Jan", revenue: 4500 },
-    { month: "Feb", revenue: 4200 },
-    { month: "Mar", revenue: 5000 },
-    { month: "Apr", revenue: 3800 },
-    { month: "May", revenue: 6200 },
-    { month: "Jun", revenue: 5800 },
-];
-
 function DashboardPageContent() {
     const searchParams = useSearchParams();
     const { user, isUserLoading } = useUser();

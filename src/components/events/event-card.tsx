@@ -44,7 +44,7 @@ export function EventCard({ event, onCompareChange, isComparing }: EventCardProp
   const isSaved = userProfile?.savedEvents?.includes(event.id) || false;
 
   useEffect(() => {
-    setFormattedDate(format(parseISO(event.date), 'MMM d, yyyy'));
+    setFormattedDate(format(parseISO(event.date as string), 'MMM d, yyyy'));
   }, [event.date]);
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
