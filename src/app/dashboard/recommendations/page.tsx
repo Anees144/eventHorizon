@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -15,20 +16,25 @@ import { getEvents } from '@/lib/events';
 export default function RecommendationsPage() {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<Event[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleGetRecommendations = async () => {
     setLoading(true);
     setRecommendations(null);
+    setError(null);
     try {
       const allEvents = await getEvents();
       const result = await getRecommendedEventsAction(allEvents);
       if (result.error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: result.error,
-        });
+        setError(result.error);
+        if (!result.error.toLowerCase().includes('profile')) {
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: result.error,
+            });
+        }
       } else {
         setRecommendations(result.recommendedEvents);
       }
@@ -72,6 +78,17 @@ export default function RecommendationsPage() {
             </div>
           )}
           
+          {error && (
+            <div className="pt-8 text-center text-red-500">
+                <p>{error}</p>
+                {error.toLowerCase().includes('profile') && (
+                    <Button asChild variant="link">
+                        <Link href="/dashboard/profile">Update Your Profile</Link>
+                    </Button>
+                )}
+            </div>
+          )}
+          
           {recommendations && recommendations.length > 0 && (
             <div className="w-full pt-8">
                 <h2 className="mb-6 text-center font-headline text-2xl font-semibold">Here are some events you might like:</h2>
@@ -83,7 +100,7 @@ export default function RecommendationsPage() {
             </div>
           )}
 
-          {recommendations && recommendations.length === 0 && !loading && (
+          {recommendations && recommendations.length === 0 && !loading && !error && (
              <div className="pt-8 text-center text-muted-foreground">
                 <p>We couldn't find any recommendations right now. Try expanding your interests!</p>
             </div>

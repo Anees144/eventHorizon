@@ -22,8 +22,8 @@ export type RecommendEventsInput = z.infer<typeof RecommendEventsInputSchema>;
 
 const RecommendEventsOutputSchema = z.object({
   recommendedEvents: z
-    .string()
-    .describe('A list of events recommended for the user.'),
+    .array(z.string())
+    .describe('A list of titles of events recommended for the user. Only return the titles.'),
 });
 export type RecommendEventsOutput = z.infer<typeof RecommendEventsOutputSchema>;
 
@@ -39,12 +39,13 @@ const prompt = ai.definePrompt({
   output: {schema: RecommendEventsOutputSchema},
   prompt: `You are an AI event recommendation system.
 
-  Based on the user profile and available events, recommend events that the user would be interested in.
+  Based on the user profile and available events, recommend up to 6 events that the user would be interested in. Only return the event titles in the response.
 
   User Profile: {{{userProfile}}}
   Available Events: {{{availableEvents}}}
-
-  Recommended Events:`,
+  
+  Do not include any other text in your response, only the list of event titles.
+  `,
 });
 
 const recommendEventsBasedOnUserInterestFlow = ai.defineFlow(

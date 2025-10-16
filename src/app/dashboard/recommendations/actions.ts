@@ -20,10 +20,14 @@ export async function getRecommendedEventsAction(allEvents: Event[]): Promise<{ 
     const userDocSnap = await getDoc(userDocRef);
 
     if (!userDocSnap.exists()) {
-        return { recommendedEvents: null, error: "User profile not found." };
+        return { recommendedEvents: null, error: "User profile not found. Please complete your profile first." };
     }
     
     const userProfileData = userDocSnap.data() as UserProfile;
+
+    if (!userProfileData.interests || userProfileData.interests.length === 0) {
+        return { recommendedEvents: null, error: "Please add some interests to your profile to get recommendations."}
+    }
 
     const userProfile = `The user's name is ${userProfileData.name} and they are interested in the following categories: ${userProfileData.interests.join(', ')}.`;
     const availableEvents = allEvents.map(event => `- ${event.title}: ${event.description} (Category: ${event.category})`).join('\n');
@@ -33,11 +37,7 @@ export async function getRecommendedEventsAction(allEvents: Event[]): Promise<{ 
       availableEvents,
     });
     
-    // This is a simplified parsing logic. A more robust solution would
-    // involve a more structured output from the AI model.
-    const recommendedTitles = result.recommendedEvents
-        .split('\n')
-        .map(line => line.replace(/^-/,'').trim().split(':')[0]);
+    const recommendedTitles = result.recommendedEvents;
 
     const recommendedEvents = allEvents.filter(event => recommendedTitles.some(title => event.title.includes(title)));
 
