@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
@@ -66,7 +66,7 @@ import { createEvent } from "@/lib/events";
 import { useToast } from "@/hooks/use-toast";
 
 
-export default function CreateEventPage() {
+function CreateEventPageContent() {
   const router = useRouter();
   const { user } = useUser();
   const { toast } = useToast();
@@ -572,3 +572,13 @@ export default function CreateEventPage() {
     </div>
   )
 }
+
+export default function CreateEventPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CreateEventPageContent />
+        </Suspense>
+    )
+}
+
+    
