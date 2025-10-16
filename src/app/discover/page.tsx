@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Event, FilterState } from '@/lib/types';
 import { getEvents } from '@/lib/events';
@@ -16,7 +16,7 @@ import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function DiscoverPage() {
+function DiscoverPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -217,4 +217,13 @@ export default function DiscoverPage() {
       </main>
     </div>
   );
+}
+
+
+export default function DiscoverPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <DiscoverPageContent />
+        </Suspense>
+    )
 }
