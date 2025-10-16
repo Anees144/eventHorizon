@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { SendHorizonal, ArrowLeft, LogIn } from 'lucide-react';
-import { useCollection, useFirebase, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc } from 'firebase/firestore';
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,16 +14,8 @@ import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getEventById } from '@/lib/events';
-import type { Event } from '@/lib/types';
+import type { Event, ForumMessage } from '@/lib/types';
 
-type ForumMessage = {
-  id: string;
-  senderId: string;
-  content: string;
-  timestamp: any;
-  senderName?: string;
-  senderAvatar?: string;
-};
 
 export default function ForumPage() {
   const params = useParams();
@@ -48,10 +40,10 @@ export default function ForumPage() {
     fetchEvent();
   }, [eventId]);
 
-  const messagesQuery = firestore ? query(
+  const messagesQuery = useMemoFirebase(() => firestore ? query(
       collection(firestore, `events/${eventId}/forums/general/messages`),
       orderBy('timestamp', 'asc')
-    ) : null;
+    ) : null, [firestore, eventId]);
 
   const { data: messages, isLoading: messagesLoading } = useCollection<ForumMessage>(messagesQuery);
   
@@ -67,7 +59,7 @@ export default function ForumPage() {
       senderId: user.uid,
       content: newMessage,
       timestamp: serverTimestamp(),
-      senderName: user.displayName || user.email || 'Anonymous User',
+      senderName: user.displayName || user.email?.split('@')[0] || 'Anonymous',
       senderAvatar: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`
     });
 
@@ -146,7 +138,7 @@ export default function ForumPage() {
                   </div>
                    {msg.senderId === user?.uid && (
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={msg.senderAvatar} />
+                      <AvatarImage src={user?.photoURL || msg.senderAvatar} />
                       <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                   )}

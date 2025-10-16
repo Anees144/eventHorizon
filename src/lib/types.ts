@@ -60,3 +60,12 @@ export type PromoCode = {
   code: string;
   discountPercentage: number;
 };
+
+export type ForumMessage = {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: any;
+  senderName?: string;
+  senderAvatar?: string;
+};
