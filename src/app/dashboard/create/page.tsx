@@ -224,9 +224,9 @@ export default function CreateEventPage() {
             </Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form Section */}
-        <div className="space-y-8">
+        <div className="lg:col-span-2 space-y-8">
             <Card>
             <CardHeader>
                 <CardTitle>Event Details</CardTitle>
@@ -329,7 +329,7 @@ export default function CreateEventPage() {
                     onChange={(e) => setLocation(e.target.value)}
                     />
                 </div>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="grid gap-3">
                         <Label htmlFor="category">Category</Label>
                         <Select value={category} onValueChange={setCategory}>
@@ -363,7 +363,7 @@ export default function CreateEventPage() {
             <CardHeader>
                 <CardTitle>Ticket Tiers</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-x-auto">
                 <Table>
                 <TableHeader>
                     <TableRow>
@@ -376,10 +376,10 @@ export default function CreateEventPage() {
                 <TableBody>
                     {ticketTiers.map((tier, index) => (
                         <TableRow key={index}>
-                            <TableCell className="font-semibold">
+                            <TableCell className="font-semibold min-w-[150px]">
                                 <Input value={tier.name} onChange={(e) => handleTierChange(index, 'name', e.target.value)} />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[150px]">
                                 <Select value={tier.type} onValueChange={(value) => handleTierChange(index, 'type', value)}>
                                     <SelectTrigger><SelectValue /></SelectTrigger>
                                     <SelectContent>
@@ -389,7 +389,7 @@ export default function CreateEventPage() {
                                     </SelectContent>
                                 </Select>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[100px]">
                                 <Input type="number" value={tier.price} onChange={(e) => handleTierChange(index, 'price', parseFloat(e.target.value))} disabled={tier.type !== 'paid'}/>
                             </TableCell>
                             <TableCell>
@@ -409,7 +409,7 @@ export default function CreateEventPage() {
                 <CardHeader>
                     <CardTitle>Promo Codes</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-auto">
                     <Table>
                     <TableHeader>
                         <TableRow>
@@ -421,8 +421,8 @@ export default function CreateEventPage() {
                     <TableBody>
                        {promoCodes.map((code, index) => (
                             <TableRow key={index}>
-                                <TableCell><Input value={code.code} onChange={(e) => handlePromoCodeChange(index, 'code', e.target.value)}/></TableCell>
-                                <TableCell><Input type="number" value={code.discountPercentage} onChange={(e) => handlePromoCodeChange(index, 'discountPercentage', parseInt(e.target.value))}/></TableCell>
+                                <TableCell className="min-w-[150px]"><Input value={code.code} onChange={(e) => handlePromoCodeChange(index, 'code', e.target.value)}/></TableCell>
+                                <TableCell className="min-w-[120px]"><Input type="number" value={code.discountPercentage} onChange={(e) => handlePromoCodeChange(index, 'discountPercentage', parseInt(e.target.value))}/></TableCell>
                                 <TableCell><Button aria-label="Delete" variant="outline" size="icon" onClick={() => removePromoCode(index)}><Trash2 className="h-4 w-4" /></Button></TableCell>
                             </TableRow>
                        ))}
@@ -456,7 +456,7 @@ export default function CreateEventPage() {
                         </div>
                         <div className="grid gap-2">
                              <Label>Gallery</Label>
-                            <div className="grid grid-cols-4 items-center gap-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 items-center gap-2">
                                 {['https://picsum.photos/seed/11/84/84', 'https://picsum.photos/seed/12/84/84', 'https://picsum.photos/seed/13/84/84'].map(src => (
                                     <button key={src} className="relative aspect-square w-full rounded-md overflow-hidden" onClick={() => setImageUrl(src.replace('/84/84','/600/400'))}>
                                         <Image alt="Gallery thumbnail" fill className="object-cover" src={src} />
@@ -474,7 +474,7 @@ export default function CreateEventPage() {
         </div>
         
         {/* Preview Section */}
-        <div className="space-y-8 sticky top-24 self-start">
+        <div className="lg:col-span-1 space-y-8 sticky top-24 self-start">
             <h2 className="font-headline text-2xl font-bold">Live Preview</h2>
             <div className="relative h-[250px] w-full">
               <Image
@@ -485,9 +485,9 @@ export default function CreateEventPage() {
                 data-ai-hint={imageHint}
               />
               <div className="absolute inset-0 bg-black/40" />
-              <div className="container relative flex h-full flex-col items-start justify-end px-4 py-6 text-primary-foreground md:px-6">
+              <div className="relative flex h-full flex-col items-start justify-end p-4 md:p-6 text-primary-foreground">
                 <Badge variant="secondary" className="mb-2 bg-secondary/80 text-secondary-foreground">{category}</Badge>
-                <h1 className="font-headline text-4xl font-bold tracking-tighter">
+                <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tighter">
                   {title}
                 </h1>
               </div>
@@ -572,5 +572,3 @@ export default function CreateEventPage() {
     </div>
   )
 }
-
-    

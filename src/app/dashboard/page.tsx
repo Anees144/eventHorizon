@@ -127,7 +127,21 @@ function DashboardPageContent() {
     }, [userEvents]);
 
     if (loading) {
-        return <div>Loading dashboard...</div>
+        return (
+          <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div className="h-4 w-2/3 animate-pulse bg-muted rounded-md" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-8 w-1/2 animate-pulse bg-muted rounded-md mb-2" />
+                  <div className="h-3 w-1/3 animate-pulse bg-muted rounded-md" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )
     }
 
 
@@ -189,7 +203,7 @@ function DashboardPageContent() {
             </CardContent>
           </Card>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-7">
             <Card className="col-span-1 lg:col-span-4">
             <CardHeader>
                 <CardTitle>My Events</CardTitle>
@@ -197,13 +211,13 @@ function DashboardPageContent() {
                 A list of events you are organizing.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-x-auto">
                 <Table>
                 <TableHeader>
                     <TableRow>
                     <TableHead>Event</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="hidden sm:table-cell">
                         Date
                     </TableHead>
                     <TableHead className="text-right">Sales</TableHead>
@@ -223,7 +237,7 @@ function DashboardPageContent() {
                             {event.isUpcoming ? `Upcoming ${event.formattedDistance}` : 'Finished'}
                         </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
+                        <TableCell className="hidden sm:table-cell">
                         {event.formattedDate}
                         </TableCell>
                         <TableCell className="text-right">${(event.ticketTiers.reduce((acc, tier) => acc + tier.price * (Math.floor(Math.random() * 100) + 10), 0)).toLocaleString()}</TableCell>
@@ -242,11 +256,11 @@ function DashboardPageContent() {
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={revenueByTier} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
+                        <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value / 1000}k`} />
                         <Tooltip formatter={(value) => `$${(value as number).toLocaleString()}`} />
-                        <Legend />
-                        <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue" />
+                        <Legend wrapperStyle={{fontSize: "14px"}} />
+                        <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
               </CardContent>

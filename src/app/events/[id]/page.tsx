@@ -23,6 +23,7 @@ import type { TicketTier, UserProfile, Event } from '@/lib/types';
 import { CalendarButton } from '@/components/events/calendar-button';
 import { ShareButton } from '@/components/events/share-button';
 import { VideoEmbed } from '@/components/events/video-embed';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EventPage() {
   const params = useParams();
@@ -69,14 +70,6 @@ export default function EventPage() {
     fetchEvent();
   }, [eventId]);
 
-  if (loadingEvent) {
-    return <div>Loading event...</div>
-  }
-
-  if (!event) {
-    notFound();
-  }
-  
   const handleSaveToggle = async () => {
     if (!user || !firestore || !event) return;
 
@@ -93,7 +86,7 @@ export default function EventPage() {
   };
 
   const handleTierChange = (tierId: string) => {
-    const tier = event.ticketTiers.find(t => t.id === tierId);
+    const tier = event?.ticketTiers.find(t => t.id === tierId);
     setSelectedTier(tier || null);
   }
 
@@ -111,12 +104,40 @@ export default function EventPage() {
     }
   }
 
+  if (loadingEvent) {
+    return (
+      <div className="flex min-h-screen w-full flex-col bg-background">
+        <MainHeader />
+        <main className="flex-1">
+          <Skeleton className="h-[300px] md:h-[500px] w-full" />
+          <div className="container py-12 md:py-16">
+            <div className="grid gap-12 md:grid-cols-3">
+              <div className="md:col-span-2 space-y-6">
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-40 w-full" />
+              </div>
+              <div className="space-y-6">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (!event) {
+    notFound();
+  }
+
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
       <MainHeader />
       <main className="flex-1">
-        <section className="relative h-[500px] w-full">
+        <section className="relative h-[300px] md:h-[500px] w-full">
           <Image
             src={event.imageUrl}
             alt={event.title}
@@ -125,16 +146,16 @@ export default function EventPage() {
             data-ai-hint={event.imageHint}
           />
           <div className="absolute inset-0 bg-black/40" />
-          <div className="container relative flex h-full flex-col items-start justify-end px-4 py-12 text-primary-foreground md:px-6">
-            <div className="flex w-full items-end justify-between">
-              <div>
+          <div className="container relative flex h-full flex-col items-start justify-end px-4 py-8 md:py-12 text-primary-foreground">
+            <div className="flex w-full flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-2">
                 <Badge variant="secondary" className="mb-2 bg-secondary/80 text-secondary-foreground">{event.category}</Badge>
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
+                <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter">
                   {event.title}
                 </h1>
               </div>
               {user && (
-                <Button variant="secondary" size="lg" onClick={handleSaveToggle}>
+                <Button variant="secondary" size="lg" onClick={handleSaveToggle} className="w-full md:w-auto">
                   {isSaved ? <BookmarkCheck className="mr-2 h-5 w-5"/> : <Bookmark className="mr-2 h-5 w-5" />}
                   {isSaved ? 'Saved' : 'Save Event'}
                 </Button>
@@ -145,12 +166,12 @@ export default function EventPage() {
 
         <section className="py-12 md:py-16">
           <div className="container grid gap-12 px-4 md:grid-cols-3 md:px-6">
-            <div className="md:col-span-2 space-y-6">
+            <div className="md:col-span-2 space-y-8">
               <div>
-                <h2 className="font-headline text-2xl font-bold">About this event</h2>
-                {event.videoUrl && <VideoEmbed url={event.videoUrl} className="mt-4" />}
+                <h2 className="font-headline text-2xl md:text-3xl font-bold">About this event</h2>
+                {event.videoUrl && <VideoEmbed url={event.videoUrl} className="mt-6" />}
                 <div
-                  className="prose prose-lg mt-4 max-w-none text-foreground/90"
+                  className="prose prose-lg mt-6 max-w-none text-foreground/90"
                   dangerouslySetInnerHTML={{ __html: event.richDescription }}
                 />
                 {event.tags && event.tags.length > 0 && (
@@ -162,10 +183,10 @@ export default function EventPage() {
                 )}
               </div>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-6 lg:sticky top-24 self-start">
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Date and Time</CardTitle>
+                  <CardTitle className="font-headline text-lg">Date and Time</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-muted-foreground">
                   <div className="flex items-center gap-2">
@@ -181,7 +202,7 @@ export default function EventPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Organizer</CardTitle>
+                  <CardTitle className="font-headline text-lg">Organizer</CardTitle>
                 </CardHeader>
                 <CardContent className="flex items-center gap-2 text-muted-foreground">
                   <User className="h-5 w-5" />
@@ -193,7 +214,7 @@ export default function EventPage() {
 
               <Card>
                 <CardHeader>
-                    <CardTitle className="font-headline">Popularity</CardTitle>
+                    <CardTitle className="font-headline text-lg">Popularity</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-3 gap-2 text-center">
                     <div className="flex flex-col items-center justify-center gap-1 rounded-md bg-muted p-2">
@@ -216,10 +237,10 @@ export default function EventPage() {
               
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Share & Sync</CardTitle>
+                  <CardTitle className="font-headline text-lg">Share & Sync</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2">
                     <CalendarButton event={event} />
                     <ShareButton event={event} />
                   </div>
@@ -228,7 +249,7 @@ export default function EventPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Event Forum</CardTitle>
+                  <CardTitle className="font-headline text-lg">Event Forum</CardTitle>
                 </CardHeader>
                 <CardContent>
                    <Button asChild className="w-full">
@@ -285,5 +306,3 @@ export default function EventPage() {
     </div>
   );
 }
-
-    

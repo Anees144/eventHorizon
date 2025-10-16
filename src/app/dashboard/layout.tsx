@@ -14,7 +14,8 @@ import {
   Sparkles,
   Users,
   Bookmark,
-  Compass
+  Compass,
+  Menu,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -73,7 +74,7 @@ export default function DashboardLayout({
   );
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const currentPath = pathname.startsWith('/dashboard') ? '/dashboard' : '/discover';
+    const currentPath = pathname.startsWith('/dashboard') ? pathname : '/discover';
     router.push(`${currentPath}?${createQueryString('search', e.target.value)}`);
   };
 
@@ -81,7 +82,7 @@ export default function DashboardLayout({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const search = formData.get('search') as string;
-    const currentPath = pathname.startsWith('/dashboard') ? '/dashboard' : '/discover';
+    const currentPath = pathname.startsWith('/dashboard') ? pathname : '/discover';
     router.push(`${currentPath}?${createQueryString('search', search)}`);
   };
 
@@ -101,7 +102,7 @@ export default function DashboardLayout({
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${pathname === href ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
                 >
                   <Icon className="h-4 w-4" />
                   {label}
@@ -120,7 +121,7 @@ export default function DashboardLayout({
                 size="icon"
                 className="shrink-0 md:hidden"
               >
-                <Package2 className="h-5 w-5" />
+                <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
@@ -128,16 +129,16 @@ export default function DashboardLayout({
               <nav className="grid gap-2 text-lg font-medium">
                 <Link
                   href="/discover"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <Logo className="h-6 w-6" />
-                  <span className="sr-only">Event Horizon</span>
+                  <span className="font-headline">Event Horizon</span>
                 </Link>
                 {navItems.map(({ href, icon: Icon, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2  hover:text-foreground ${pathname === href ? 'bg-muted text-foreground' : 'text-muted-foreground'}`}
                   >
                     <Icon className="h-5 w-5" />
                     {label}

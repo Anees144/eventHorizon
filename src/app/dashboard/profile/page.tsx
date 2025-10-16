@@ -22,9 +22,10 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/lib/data";
 import type { UserProfile } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfilePage() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -33,6 +34,8 @@ export default function ProfilePage() {
   const [photoURL, setPhotoURL] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
 
   const userProfileRef = useMemoFirebase(
     () => (firestore && user ? doc(firestore, 'users', user.uid) : null),
@@ -40,23 +43,27 @@ export default function ProfilePage() {
   );
   
   useEffect(() => {
-    if (user) {
-      setDisplayName(user.displayName || '');
-      setPhotoURL(user.photoURL || '');
-    }
-
     async function fetchUserProfile() {
+        if (user) {
+          setDisplayName(user.displayName || '');
+          setPhotoURL(user.photoURL || '');
+        }
+
         if(userProfileRef) {
+            setIsLoadingProfile(true);
             const docSnap = await getDoc(userProfileRef);
             if (docSnap.exists()) {
                 const data = docSnap.data() as UserProfile;
                 setInterests(data.interests || []);
             }
+            setIsLoadingProfile(false);
+        } else if (!isUserLoading) {
+          setIsLoadingProfile(false);
         }
     }
     fetchUserProfile();
 
-  }, [user, userProfileRef]);
+  }, [user, userProfileRef, isUserLoading]);
 
 
   const handleInterestChange = (category: string, checked: boolean) => {
@@ -109,10 +116,60 @@ export default function ProfilePage() {
   }
 
 
+  if (isUserLoading || isLoadingProfile) {
+    return (
+        <div className="grid gap-6">
+           <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-1 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/3" />
+                            <Skeleton className="h-4 w-2/3" />
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex flex-col items-center gap-4">
+                                <Skeleton className="h-24 w-24 rounded-full" />
+                                <div className="flex gap-2">
+                                   <Skeleton className="h-9 w-20" />
+                                   <Skeleton className="h-9 w-20" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-1/4" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-1/4" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="md:col-span-2">
+                    <Card>
+                         <CardHeader>
+                            <Skeleton className="h-6 w-1/3" />
+                            <Skeleton className="h-4 w-2/3" />
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {[...Array(categories.length)].map((_, i) => (
+                                <div key={i} className="flex items-center space-x-2">
+                                    <Skeleton className="h-4 w-4" />
+                                    <Skeleton className="h-4 w-20" />
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                </div>
+           </div>
+        </div>
+    )
+  }
+
   if (!user) {
     return (
         <div className="flex items-center justify-center h-full">
-            <p>Loading profile...</p>
+            <p>Please log in to view your profile.</p>
         </div>
     )
   }
@@ -158,7 +215,7 @@ export default function ProfilePage() {
                         This helps us recommend events you'll love.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         {categories.map((category) => (
                             <div key={category} className="flex items-center space-x-2">
                                 <Checkbox 

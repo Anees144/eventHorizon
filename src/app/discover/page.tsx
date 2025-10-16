@@ -14,6 +14,7 @@ import { MainHeader } from '@/components/layout/main-header';
 import { CompareButton } from '@/components/events/compare-button';
 import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DiscoverPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function DiscoverPage() {
     } else {
       params.delete(name);
     }
-    router.push(`?${params.toString()}`, { scroll: false });
+    router.push(`/discover?${params.toString()}`, { scroll: false });
   }, [searchParams, router]);
 
   const updateDateQueryParams = useCallback((dateRange: DateRange | undefined) => {
@@ -75,7 +76,7 @@ export default function DiscoverPage() {
     } else {
       params.delete('to');
     }
-    router.push(`?${params.toString()}`, { scroll: false });
+    router.push(`/discover?${params.toString()}`, { scroll: false });
   }, [searchParams, router]);
 
 
@@ -176,7 +177,25 @@ export default function DiscoverPage() {
         </section>
 
         {loading ? (
-          <div className="container py-12 text-center">Loading events...</div>
+          <div className="container py-12 space-y-12">
+            {[...Array(3)].map((_, i) => (
+              <div key={i}>
+                <Skeleton className="h-8 w-1/4 mb-6" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, j) => (
+                     <div key={j} className="space-y-4 rounded-lg">
+                        <Skeleton className="h-40 rounded-md" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-2/3" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                        </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <section className="container py-12 space-y-12">
             {groupedEvents.length > 0 ? (
