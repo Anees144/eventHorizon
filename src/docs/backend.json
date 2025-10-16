@@ -1,0 +1,140 @@
+
+{
+  "entities": {
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents an event created by a user.",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "richDescription": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "imageHint": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "organizer": { "type": "string" },
+        "organizerId": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "visibility": { "type": "string", "enum": ["public", "private", "invite-only"] },
+        "ticketTiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "price": { "type": "number" },
+              "type": { "type": "string", "enum": ["paid", "reservation", "donation"] }
+            },
+            "required": ["id", "name", "price", "type"]
+          }
+        },
+        "promoCodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "discountPercentage": { "type": "number" }
+            },
+            "required": ["code", "discountPercentage"]
+          }
+        }
+      },
+      "required": [
+        "title", "description", "richDescription", "imageUrl", "imageHint", 
+        "category", "date", "location", "latitude", "longitude", "organizer", 
+        "organizerId", "visibility", "ticketTiers"
+      ]
+    },
+    "Message": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Message",
+      "type": "object",
+      "description": "Represents a single message within the platform.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the message." },
+        "senderId": { "type": "string", "description": "Reference to User who sent the message. (Relationship: User 1:N Message)" },
+        "forumId": { "type": "string", "description": "Reference to Forum where the message was posted. (Relationship: Forum 1:N Message)" },
+        "content": { "type": "string", "description": "The text content of the message." },
+        "timestamp": { "type": "string", "description": "The date and time when the message was sent.", "format": "date-time" }
+      },
+      "required": ["id", "senderId", "forumId", "content", "timestamp"]
+    },
+    "Forum": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Forum",
+      "type": "object",
+      "description": "Represents a forum associated with an event.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the forum." },
+        "eventId": { "type": "string", "description": "Reference to Event that the forum is associated with. (Relationship: Event 1:1 Forum)" },
+        "name": { "type": "string", "description": "The name of the forum." },
+        "description": { "type": "string", "description": "A description of the forum." }
+      },
+      "required": ["id", "eventId", "name", "description"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "type": "object",
+      "description": "Represents a user's profile information.",
+      "properties": {
+        "name": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "interests": { "type": "array", "items": { "type": "string" }, "description": "A list of the user's interests." },
+        "savedEvents": { "type": "array", "items": { "type": "string" }, "description": "A list of event IDs that the user has saved." }
+      },
+      "required": ["name", "email"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": { "$ref": "#/backend/entities/UserProfile" },
+          "description": "Stores user profile information."
+        }
+      },
+      {
+        "path": "/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": { "$ref": "#/backend/entities/Event" },
+          "description": "Stores all event data."
+        }
+      },
+      {
+        "path": "/events/{eventId}/forums/{forumId}",
+        "definition": {
+          "entityName": "Forum",
+          "schema": { "$ref": "#/backend/entities/Forum" },
+          "description": "Represents a forum associated with an event."
+        }
+      },
+      {
+        "path": "/events/{eventId}/forums/{forumId}/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": { "$ref": "#/backend/entities/Message" },
+          "description": "Represents a message within a forum."
+        }
+      }
+    ]
+  }
+}
+
+    
